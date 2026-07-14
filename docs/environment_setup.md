@@ -4,9 +4,9 @@
 
 This guide explains how every team member should configure the project development environment using:
 
-- Windows
+- Windows or macOS
 - Visual Studio Code
-- Git Bash
+- Terminal (Git Bash on Windows, Terminal/iTerm2 on macOS)
 - Anaconda or Miniconda
 - Python
 - Jupyter Notebooks
@@ -22,9 +22,9 @@ Every team member should use the following project configuration:
 
 | Setting | Project Standard |
 |---|---|
-| Operating system | Windows |
+| Operating system | Windows or macOS |
 | Code editor | Visual Studio Code |
-| Terminal | Git Bash |
+| Terminal | Git Bash (Windows) or Terminal/iTerm2 (macOS) |
 | Environment manager | Conda |
 | Python version | Python 3.11 |
 | Conda environment name | `podcast-studio-env` |
@@ -43,9 +43,16 @@ Each team member creates the environment locally. The environment itself is not 
 
 Before cloning the repository, confirm that the following software is installed:
 
-- Git for Windows
-- Git Bash
+**Windows:**
+
+- Git for Windows (includes Git Bash)
 - Anaconda or Miniconda
+- Visual Studio Code
+
+**macOS:**
+
+- Git (via `xcode-select --install` or `brew install git`)
+- Anaconda or Miniconda (via the installer or `brew install --cask miniconda`)
 - Visual Studio Code
 
 In Visual Studio Code, install these extensions:
@@ -64,7 +71,7 @@ Optional extensions:
 
 ## 3. Clone the Repository
 
-Open Git Bash in the folder where the project should be stored.
+Open your terminal (Git Bash on Windows, Terminal on macOS) in the folder where the project should be stored.
 
 Clone the shared repository:
 
@@ -88,9 +95,9 @@ Do not open only an individual Python file. Open the complete repository folder 
 
 ---
 
-## 4. Confirm That Conda Works in Git Bash
+## 4. Confirm That Conda Works in the Terminal
 
-Open a Git Bash terminal and run:
+Open your terminal (Git Bash on Windows, Terminal on macOS) and run:
 
 ```bash
 conda --version
@@ -108,9 +115,9 @@ The exact version may be different.
 
 Continue to the environment-creation section.
 
-### If Git Bash Shows `conda: command not found`
+### If the Terminal Shows `conda: command not found`
 
-Open **Anaconda Prompt** from the Windows Start menu and run:
+**Windows:** Open **Anaconda Prompt** from the Windows Start menu and run:
 
 ```bash
 conda init bash
@@ -124,6 +131,24 @@ Then:
 4. Reopen Visual Studio Code.
 5. Open a new Git Bash terminal.
 6. Run:
+
+```bash
+conda --version
+```
+
+**macOS:** Run the init command directly in Terminal (no separate prompt app exists on macOS):
+
+```bash
+conda init zsh
+```
+
+Then:
+
+1. Close every Terminal window.
+2. Close Visual Studio Code.
+3. Reopen Visual Studio Code.
+4. Open a new Terminal.
+5. Run:
 
 ```bash
 conda --version
@@ -181,12 +206,18 @@ The terminal should now begin with:
 (podcast-studio-env)
 ```
 
-Example:
+Example (Windows Git Bash):
 
 ```text
 (podcast-studio-env)
 paola@computer MINGW64 ~/project-folder
 $
+```
+
+Example (macOS Terminal):
+
+```text
+(podcast-studio-env) john@computer project-folder %
 ```
 
 Do not develop this project directly inside the Conda `base` environment.
@@ -408,7 +439,7 @@ src/podcast_pipeline.py
 
 ### Activate the Environment
 
-Before running Python code, open the Visual Studio Code Git Bash terminal and run:
+Before running Python code, open the Visual Studio Code terminal (Git Bash on Windows, Terminal on macOS) and run:
 
 ```bash
 conda activate podcast-studio-env
@@ -682,7 +713,7 @@ Confirm that `.env`, private manuscript files, and generated audio are not stage
 
 Each development session should begin with the following steps.
 
-### Step 1 — Open Git Bash
+### Step 1 — Open the Terminal
 
 Navigate to the repository:
 
@@ -862,7 +893,7 @@ The final application must not depend on manually running notebook cells in a pa
 
 Every team member should confirm the following before beginning development:
 
-- [ ] Git Bash opens correctly
+- [ ] Terminal opens correctly (Git Bash on Windows, Terminal on macOS)
 - [ ] `git --version` works
 - [ ] `conda --version` works
 - [ ] The repository is cloned
@@ -903,13 +934,21 @@ conda env create -f environment.yml
 
 ### Problem: `conda: command not found`
 
-Open Anaconda Prompt and run:
+**Windows:** Open Anaconda Prompt and run:
 
 ```bash
 conda init bash
 ```
 
 Close and reopen Visual Studio Code and Git Bash.
+
+**macOS:** Run directly in Terminal:
+
+```bash
+conda init zsh
+```
+
+Close and reopen Visual Studio Code and Terminal.
 
 ---
 
@@ -1066,7 +1105,7 @@ import sys
 print(sys.executable)
 ```
 
-In Git Bash:
+In the terminal (Git Bash on Windows, Terminal on macOS):
 
 ```bash
 python -c "import sys; print(sys.executable)"
