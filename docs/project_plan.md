@@ -1,4 +1,4 @@
-# Mini-Project Plan
+# Project Plan
 
 ## The Quality of the Question: AI Podcast Studio
 
@@ -29,7 +29,7 @@ The source material will be an excerpt from *The Quality of the Question*, writt
 
 ## 2. Project Overview
 
-*The Quality of the Question: AI Podcast Studio* is a Python application that transforms an excerpt from the entrepreneurship themed book, *The Quality of the Question*, and transforms it into a structured podcast episode.
+*The Quality of the Question: AI Podcast Studio* is a Python application that takes an excerpt from the entrepreneurship themed book, *The Quality of the Question*, and transforms it into a structured podcast episode.
 
 The application will follow the following flow:
 
@@ -48,7 +48,7 @@ The project will be developed collaboratively in Visual Studio Code and managed 
 
 ## 3. Problem Statement
 
-Entrepreneurship books contain valuable ideas, stories, and practical exercises, but readers do not always have enough time to consume long-form written content. As with these types of knowledge content, it can often be easier to diguest in an audio format providing users with more choice in consuming such content.
+Entrepreneurship books contain valuable ideas, stories, and practical exercises, but readers do not always have enough time to consume long-form written content. As with these types of knowledge content, it can often be easier to digest in an audio format providing users with more choice in consuming such content.
 
 Traditional text-to-speech tools only read the original text aloud. They do not reorganize it into a shorter and more engaging learning experience.
 
@@ -101,7 +101,7 @@ The application will process a short excerpt from book: *The Quality of the Ques
 
 For the MVP, the source will be stored as a plain file.
 
-Using plain text avoids unnecessary PDF parsing and keeps the mini-project focused on the required AI pipeline.
+Using plain text avoids unnecessary PDF parsing and keeps the project focused on the required AI pipeline.
 
 ### 6.2 Content Transformation
 
@@ -111,7 +111,7 @@ The model will be instructed to:
 
 - Use only information from the provided source
 - Preserve the author’s meaning
-- Adapt the content for spoken delivery, and translate from Spansih to English
+- Adapt the content for spoken delivery, and translate from Spanish to English
 - Avoid inventing quotations, facts, statistics, or stories
 - Produce a concise podcast episode
 - Return a consistent structured response
@@ -336,7 +336,7 @@ pydantic
 
 ## 12. Relevant Course Materials
 
-The team should search for the follwoing example course files when producing code.
+The team should search for the following example course files when producing code.
 
 | Project Step | Course File | Relevant Pattern |
 |---|---|---|
@@ -349,7 +349,7 @@ The team should search for the follwoing example course files when producing cod
 | Transcript reference | `transcript.json` | Structured transcript pattern |
 | Subtitle reference | `transcript.srt` | Timestamped transcript pattern |
 
-The following are not required for this mini-project:
+The following are not required for this project:
 
 - PDF parsing
 - RSS ingestion
@@ -358,7 +358,7 @@ The following are not required for this mini-project:
 
 ---
 
-## 13. Team Responsibilities - To Be Determined
+## 13. Team Responsibilities (TO BE DETERMIED)
 
 ### Data Input, Product, and Editorial Lead
 
@@ -809,7 +809,6 @@ The team should avoid one large final commit containing the entire project.
 - What maximum word count will be allowed?
 - Which text-to-speech provider will be used?
 - Which voice will be used?
-- Is FastAPI actually required, or is Gradio sufficient?
 
 These decisions should be resolved before major implementation begins.
 
@@ -958,7 +957,7 @@ Audio Playback
 
 ### Presentation
 
-The presentation should last approximately 5–7 minutes, followed by Q&A.
+The presentation should last approximately 10 minutes (presentation + Q&A).
 
 ---
 
@@ -968,7 +967,7 @@ The presentation should last approximately 5–7 minutes, followed by Q&A.
 
 - Introduce the team
 - Introduce the book
-- Explain the mini-project context
+- Explain the project context
 - Explain the target user
 - Present the problem
 
@@ -1071,7 +1070,7 @@ The project should include:
 
 ## 27. Definition of Done
 
-The mini-project will be considered complete when:
+The project will be considered complete when:
 
 - A new user can clone the repository
 - The README explains how to install and run the application
@@ -1097,7 +1096,7 @@ The mini-project will be considered complete when:
 
 ## 28. Future Improvements
 
-The following features are outside the mini-project MVP and may be considered for the complete Project 1 version:
+The following features are outside the project MVP and may be considered for the complete Project 1 version:
 
 - Two-speaker podcast conversations
 - Multiple AI voices
@@ -1118,4 +1117,4 @@ The following features are outside the mini-project MVP and may be considered fo
 - FastAPI backend
 - Deployment to an online platform
 
-These features will only be considered after the required mini-project pipeline is complete and stable.
+These features will only be considered after the required project pipeline is complete and stable.

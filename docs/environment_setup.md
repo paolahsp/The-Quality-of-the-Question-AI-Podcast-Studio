@@ -244,19 +244,19 @@ python -m pip install -r requirements.txt
 If `requirements.txt` does not exist yet, install the initial packages:
 
 ```bash
-python -m pip install openai gradio python-dotenv pydantic pytest jupyter ipykernel
+python -m pip install openai==2.45.0 gradio==6.20.0 python-dotenv==1.2.2 pydantic==2.13.4 pytest==9.1.1 jupyter==1.1.1 ipykernel==7.3.0
 ```
 
 The initial project dependencies are:
 
 ```text
-openai
-gradio
-python-dotenv
-pydantic
-pytest
-jupyter
-ipykernel
+openai==2.45.0
+gradio==6.20.0
+python-dotenv==1.2.2
+pydantic==2.13.4
+pytest==9.1.1
+jupyter==1.1.1
+ipykernel==7.3.0
 ```
 
 These packages support:
@@ -284,16 +284,14 @@ requirements.txt
 Initial content:
 
 ```text
-openai
-gradio
-python-dotenv
-pydantic
-pytest
-jupyter
-ipykernel
+openai==2.45.0
+gradio==6.20.0
+python-dotenv==1.2.2
+pydantic==2.13.4
+pytest==9.1.1
+jupyter==1.1.1
+ipykernel==7.3.0
 ```
-
-Package versions may be pinned later after the complete application works correctly.
 
 Every team member must install dependencies from this file instead of installing unrelated packages individually.
 
@@ -319,13 +317,13 @@ dependencies:
   - python=3.11
   - pip
   - pip:
-      - openai
-      - gradio
-      - python-dotenv
-      - pydantic
-      - pytest
-      - jupyter
-      - ipykernel
+      - openai==2.45.0
+      - gradio==6.20.0
+      - python-dotenv==1.2.2
+      - pydantic==2.13.4
+      - pytest==9.1.1
+      - jupyter==1.1.1
+      - ipykernel==7.3.0
 ```
 
 This file documents:
@@ -884,6 +882,24 @@ Every team member should confirm the following before beginning development:
 ---
 
 ## 22. Troubleshooting
+
+### Problem: Conda Asks to Accept Channel Terms of Service
+
+When creating the environment for the first time, Conda may prompt you to accept the Terms of Service for the `defaults` channel.
+
+Accept it by running:
+
+```bash
+conda tos accept --override-channels --channel defaults
+```
+
+Then re-run:
+
+```bash
+conda env create -f environment.yml
+```
+
+---
 
 ### Problem: `conda: command not found`
 
