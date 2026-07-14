@@ -12,47 +12,43 @@
 
 ## 1. Project Context
 
-This project is the mini-project titled **Generate a Small Podcast from Notes**, which precedes the complete Project 1: Podcast Studio.
+**Project name:** Podcast Studio Duration: 1 Type: Group Module: Module 1
 
-The purpose of this stage is to practice the essential AI podcast workflow without building a large or overly complex application.
+The project focus:
 
-The project will therefore remain intentionally focused:
+- Process data from a source: Accept input from at least one source type (PDF, API call, internet article, voice recording, etc.)
+- Reprocess using LLM API: Transform the input data using an LLM API call (OpenAI, Anthropic, or similar)
+- Generate audio file: Convert the processed text into an audio file using text-to-speech
+- Use Python data structures: Implement clean, structured code using appropriate Python data structures (dictionaries, lists, classes, etc.) to keep processing standardized
+- Build Gradio interface: Create a functional web interface using Gradio
+- Handle errors gracefully: Include proper error handling and user feedback
 
-- One short authorized book excerpt
-- One AI-generated podcast script
-- One narrator
-- One generated audio file
-- One minimal Gradio interface
-- Clear error handling
-- Complete GitHub documentation
-
-The source material will be an authorized excerpt from *The Quality of the Question*, written by team member Paola Hintze.
-
-This source satisfies the project’s text-based data-input requirement.
+The source material will be an excerpt from *The Quality of the Question*, written by team member Paola Hintze.
 
 ---
 
 ## 2. Project Overview
 
-*The Quality of the Question: AI Podcast Studio* is a Python application that transforms an authorized excerpt from an entrepreneurship book into a short, structured podcast episode.
+*The Quality of the Question: AI Podcast Studio* is a Python application that transforms an excerpt from the entrepreneurship themed book, *The Quality of the Question*, and transforms it into a structured podcast episode.
 
-The application will allow the user to:
+The application will follow the following flow:
 
-1. Load or select a short book excerpt.
-2. Choose basic podcast settings.
-3. Generate a podcast-style script using a language model.
-4. Review and edit the generated script.
-5. Convert the approved script into audio using text-to-speech.
-6. Listen to the final audio.
-7. Download the podcast audio and transcript.
+1. Take source material, translate content from ES → EN, and generate a podcast-style script as the input
+1. Transform the input data using an LLM API call
+1. Convert input into audio using text-to-speech
+1. Generate audio and transcripts
+1. Be able to play audio
+1. Be able to download audio and transcripts
 
 The project will be developed collaboratively in Visual Studio Code and managed through a shared GitHub repository.
+
+**Repo:** https://github.com/paolahsp/The-Quality-of-the-Question-AI-Podcast-Studio
 
 ---
 
 ## 3. Problem Statement
 
-Entrepreneurship books contain valuable ideas, stories, and practical exercises, but readers do not always have enough time to consume long-form written content.
+Entrepreneurship books contain valuable ideas, stories, and practical exercises, but readers do not always have enough time to consume long-form written content. As with these types of knowledge content, it can often be easier to diguest in an audio format providing users with more choice in consuming such content.
 
 Traditional text-to-speech tools only read the original text aloud. They do not reorganize it into a shorter and more engaging learning experience.
 
@@ -75,7 +71,7 @@ The initial target user is an aspiring entrepreneur, student, or early-stage fou
 
 ## 5. Project Objective
 
-The objective is to build and demonstrate the complete AI podcast pipeline required by the project brief.
+The objective is to build and demonstrate an podcast pipeline automated with multiple AI technologies.
 
 ```text
 Data Input
@@ -86,14 +82,14 @@ LLM Content Transformation
     ↓
 Structured Podcast Script
     ↓
-Human Review and Editing
+Human Review and validation
     ↓
 Text-to-Speech Generation
     ↓
 Podcast Audio and Transcript
 ```
 
-The final application must demonstrate how written source material becomes a reviewed and playable podcast episode.
+The final application will demonstrate how written source material can becomes a playable podcast.
 
 ---
 
@@ -101,36 +97,36 @@ The final application must demonstrate how written source material becomes a rev
 
 ### 6.1 Data Input
 
-The application will process a short excerpt from *The Quality of the Question*.
+The application will process a short excerpt from book: *The Quality of the Question*.
 
-For the MVP, the source will be stored as a plain-text or Markdown file.
+For the MVP, the source will be stored as a plain file.
 
 Using plain text avoids unnecessary PDF parsing and keeps the mini-project focused on the required AI pipeline.
 
 ### 6.2 Content Transformation
 
-A language-model API call will transform the excerpt into a structured podcast script.
+A language-model will transform the excerpt into a structured podcast script.
 
 The model will be instructed to:
 
 - Use only information from the provided source
 - Preserve the author’s meaning
-- Adapt the content for spoken delivery
+- Adapt the content for spoken delivery, and translate from Spansih to English
 - Avoid inventing quotations, facts, statistics, or stories
 - Produce a concise podcast episode
 - Return a consistent structured response
 
 ### 6.3 Human Review
 
-The generated script will appear in an editable field before audio generation.
+The generated script will be validated before audio generation.
 
-The user must be able to review and modify the script.
+The user must be able to review and and finetune the script.
 
-This step ensures that AI assists with the creative process while the human user maintains final editorial control.
+This step ensures that AI assists with the creative process while the human user maintains final editorial control (human in the loop).
 
 ### 6.4 Audio Generation
 
-The approved script will be sent to a text-to-speech service.
+The validated script will be processed for text-to-speech.
 
 The system will generate one final audio file in MP3 format.
 
@@ -143,7 +139,7 @@ Book Excerpt
     ↓
 Generate Script
     ↓
-Review or Edit Script
+Review and Validate Script
     ↓
 Generate Audio
     ↓
@@ -160,28 +156,13 @@ The application must display understandable user-facing messages when:
 - The language-model request fails
 - The model returns an invalid response
 - Text-to-speech generation fails
-- The output file cannot be created
+- The output file cannot be created or download fails
 
 ---
 
 ## 7. Minimum Viable Product
 
-The MVP will use a short authorized excerpt from Chapter 1, *The First Question*.
-
-The first version will use a **single narrator**.
-
-The user will be able to:
-
-1. Load or select the authorized excerpt.
-2. Choose an episode length.
-3. Choose a podcast tone.
-4. Choose a target audience.
-5. Generate a structured podcast script.
-6. Review and edit the generated script.
-7. Convert the approved script into audio.
-8. Listen to the audio inside the application.
-9. Download the audio.
-10. Download the approved transcript.
+The MVP will use a short excerpt from Chapter 1, *The First Question*.
 
 ### MVP Scope Limitations
 
@@ -194,8 +175,6 @@ The MVP will not initially include:
 - RSS feeds
 - External news or data aggregation
 - Speech-to-text input
-- Whisper transcription
-- Long-document chunking
 - Multiple chapter generation
 - FastAPI unless explicitly required by the instructor
 
@@ -274,7 +253,7 @@ The proposed structure is:
 }
 ```
 
-The application will validate the response before presenting it to the user or generating audio.
+The application will validate the response before generating audio.
 
 Pydantic may be used to define and validate this structure.
 
@@ -353,13 +332,11 @@ python-dotenv
 pydantic
 ```
 
-FastAPI will only be added if the instructor confirms that a separate API layer is required.
-
 ---
 
 ## 12. Relevant Course Materials
 
-The team should search for these course files by file name because folder structures may differ between students.
+The team should search for the follwoing example course files when producing code.
 
 | Project Step | Course File | Relevant Pattern |
 |---|---|---|
@@ -377,14 +354,13 @@ The following are not required for this mini-project:
 - PDF parsing
 - RSS ingestion
 - External API aggregation
-- Whisper speech-to-text
 - Audio recording input
 
 ---
 
-## 13. Team Responsibilities
+## 13. Team Responsibilities - To Be Determined
 
-### Paola — Data Input, Product, and Editorial Lead
+### Data Input, Product, and Editorial Lead
 
 Paola will be responsible for the source material, product definition, prompt content, and editorial integrity.
 
@@ -415,7 +391,7 @@ data/sample_chapters/chapter_01_excerpt.md
 
 ---
 
-### John — LLM and TTS Backend Lead
+### LLM and TTS Backend Lead
 
 John will be responsible for the transformation and audio-generation pipeline.
 
@@ -446,7 +422,7 @@ tests/test_pipeline.py
 
 ---
 
-### Marja — Gradio Interface, Integration, and Demo Lead
+### Gradio Interface, Integration, and Demo Lead
 
 Marja will be responsible for the user interface and demonstration experience.
 
@@ -582,13 +558,6 @@ The objective is to avoid passing unrelated loose variables between modules.
 
 ## 17. API Key and Cost Strategy
 
-Before development begins, the team must decide:
-
-- Which team member will provide the development API key
-- Which provider will be used
-- How API usage will be monitored
-- Whether each member will use an individual key
-
 Rules:
 
 - API keys must be stored in `.env`
@@ -631,7 +600,7 @@ __pycache__/
 
 The software will be credited separately:
 
-> Podcast Studio software developed by Paola Hintze, Marja, and John.
+> The Quality of the Question: AI Podcast Studio software developed by Paola Hintze, Marja, and John.
 
 ---
 
@@ -641,17 +610,16 @@ The software will be credited separately:
 
 #### Tasks
 
-- Create the shared GitHub repository
-- Add Marja and John as collaborators
+- ~~Create the shared GitHub repository~~
+- ~~Add Marja and John as collaborators~~
 - Confirm that everyone can clone, pull, and push
-- Create the project structure
-- Add `.gitignore`
-- Add `.env.example`
-- Decide the LLM provider
+- ~~Create the project structure~~
+- ~~Add `.gitignore`~~
+- ~~Add `.env.example`~~
+- ~~Decide the LLM provider~~
 - Decide the TTS provider
 - Confirm one-narrator MVP
 - Confirm the authorized excerpt
-- Confirm group-coding expectations with the instructor
 
 #### Expected Result
 
@@ -671,10 +639,6 @@ A shared repository with clear scope, secure configuration, and confirmed team a
 - Validate that the input is not empty
 - Create the initial prompt
 
-#### Owner
-
-Paola
-
 #### Expected Result
 
 The project can load and validate the source text.
@@ -691,10 +655,6 @@ The project can load and validate the source text.
 - Validate the model response
 - Convert the structured response into an editable podcast script
 - Handle API and validation errors
-
-#### Owner
-
-John
 
 #### Expected Result
 
@@ -713,17 +673,13 @@ The project can generate a complete podcast script from the command line.
 - Handle TTS errors
 - Verify that the generated file can be played
 
-#### Owner
-
-John
-
 #### Expected Result
 
 The project can generate one clear and playable podcast audio file.
 
 ---
 
-### Phase 5 — Gradio Interface
+### Phase 5 — Gradio Interface (TO BE DETERMINED)
 
 #### Tasks
 
@@ -736,10 +692,6 @@ The project can generate one clear and playable podcast audio file.
 - Add transcript download
 - Add audio download
 - Display user-friendly status and error messages
-
-#### Owner
-
-Marja
 
 #### Expected Result
 
@@ -764,10 +716,6 @@ The complete workflow can be operated through the Gradio interface.
 - Test the application from a clean installation
 - Confirm that no secret or private manuscript content is committed
 
-#### Owners
-
-All team members
-
 #### Expected Result
 
 A stable end-to-end application with understandable error handling.
@@ -788,10 +736,6 @@ A stable end-to-end application with understandable error handling.
 - Prepare the live or recorded demo
 - Create presentation backup materials
 - Rehearse the 5–7 minute presentation
-
-#### Owners
-
-All team members
 
 #### Expected Result
 
@@ -861,15 +805,11 @@ The team should avoid one large final commit containing the entire project.
 ### Decisions Still Required
 
 - Which exact Chapter 1 excerpt will be used?
+- Is it word for word, a summary, or a reformatting of content into a new topic?
 - What maximum word count will be allowed?
-- Which language-model provider will be used?
 - Which text-to-speech provider will be used?
 - Which voice will be used?
-- Whose API key will be used during integration?
-- Does every team member need a separate key?
-- Does the instructor expect one shared codebase or independent coding?
 - Is FastAPI actually required, or is Gradio sufficient?
-- Should the final sample MP3 be included in GitHub or shown only during the demo?
 
 These decisions should be resolved before major implementation begins.
 
@@ -881,23 +821,21 @@ These decisions should be resolved before major implementation begins.
 
 - [x] Create shared GitHub repository
 - [x] Create initial project plan
-- [ ] Add Marja as a collaborator
-- [ ] Add John as a collaborator
+- [x] Add Marja as a collaborator
+- [x] Add John as a collaborator
 - [ ] Confirm clone, pull, and push access for all members
-- [ ] Add `.gitignore`
-- [ ] Add `.env.example`
-- [ ] Add `requirements.txt`
+- [x] Add `.gitignore`
+- [x] Add `.env.example`
+- [x] Add `requirements.txt`
 - [ ] Create repository folders
 
 ### Project Decisions
 
 - [ ] Select the exact excerpt
 - [ ] Confirm the excerpt length
-- [ ] Confirm LLM provider
+- [x] Confirm LLM provider
 - [ ] Confirm TTS provider
 - [ ] Confirm voice
-- [ ] Confirm API-key strategy
-- [ ] Confirm group-coding requirements with the instructor
 
 ### Data Input
 
@@ -1028,8 +966,6 @@ The presentation should last approximately 5–7 minutes, followed by Q&A.
 
 ### Introduction
 
-Presented by Paola.
-
 - Introduce the team
 - Introduce the book
 - Explain the mini-project context
@@ -1037,8 +973,6 @@ Presented by Paola.
 - Present the problem
 
 ### Technical Solution
-
-Presented by John.
 
 - Explain the pipeline
 - Explain the data structure
@@ -1048,8 +982,6 @@ Presented by John.
 - Explain error handling
 
 ### Live Demonstration
-
-Presented by Marja.
 
 - Load or select the excerpt
 - Choose the podcast settings
@@ -1061,8 +993,6 @@ Presented by Marja.
 - Show the downloadable files
 
 ### Takeaways
-
-Presented by Paola.
 
 - Explain what the team learned
 - Explain why human review matters
