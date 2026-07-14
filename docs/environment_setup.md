@@ -69,7 +69,7 @@ Open Git Bash in the folder where the project should be stored.
 Clone the shared repository:
 
 ```bash
-git clone <(https://github.com/paolahsp/The-Quality-of-the-Question-AI-Podcast-Studio/tree/main)>
+git clone https://github.com/paolahsp/The-Quality-of-the-Question-AI-Podcast-Studio.git
 ```
 
 Enter the repository folder:
