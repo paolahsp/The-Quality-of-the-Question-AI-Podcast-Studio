@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Quality of the Question — AI Podcast Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eceee8;
+    --bg-alt: #dfe2da;
+    --ink: #242621;
+    --ink-soft: #6b6f65;
+    --accent: #f07167;
+    --accent-2: #c7ccc5;
+    --type-display: 6.2vw;
+    --type-title: 3.4vw;
+    --type-subtitle: 2.1vw;
+    --type-body: 1.5vw;
+    --type-small: 1.15vw;
+    --pad-x: 6vw;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    background: var(--ink);
+    font-family: 'Inter', Helvetica, Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .deck {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  section.slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 5vh var(--pad-x);
+    background: var(--bg);
+  }
+
+  section.slide.is-active {
+    display: flex;
+  }
+
+  section.slide.alt-bg {
+    background: var(--bg-alt);
+  }
+
+  section.slide.dark-bg {
+    background: var(--ink);
+  }
+
+  .eyebrow {
+    color: var(--accent);
+    font-size: var(--type-small);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 3vh;
+  }
+
+  .eyebrow::after {
+    content: "::";
+  }
+
+  .dark-bg .eyebrow {
+    color: var(--accent-2);
+  }
+
+  h1.display {
+    margin: 0;
+    color: var(--ink);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: var(--type-display);
+    font-weight: 700;
+    line-height: 1.02;
+    max-width: 80%;
+  }
+
+  .dark-bg h1.display {
+    color: var(--bg);
+    text-align: center;
+  }
+
+  p.subtitle {
+    margin: 3vh 0 0;
+    color: var(--ink-soft);
+    font-size: var(--type-subtitle);
+    font-weight: 400;
+    max-width: 65%;
+  }
+
+  .bars {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 18vh;
+    padding: 0 var(--pad-x);
+    opacity: 0.5;
+  }
+
+  .bars.center {
+    justify-content: center;
+    bottom: 10vh;
+    height: 10vh;
+    opacity: 0.3;
+  }
+
+  .bars div {
+    width: 10px;
+  }
+
+  .bars.center div {
+    width: 12px;
+    border-radius: 4px;
+  }
+
+  .bars div:nth-child(odd) {
+    background: var(--accent);
+  }
+
+  .bars div:nth-child(even) {
+    background: var(--accent-2);
+  }
+
+  /* Team slide */
+  .team-row {
+    display: flex;
+    flex: 1;
+    gap: 5vw;
+    align-items: flex-start;
+  }
+
+  .team-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2vh;
+  }
+
+  .team-card img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .team-name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: var(--type-title);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .team-role {
+    font-size: var(--type-body);
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+
+  /* Problem slide */
+  .bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5vh;
+  }
+
+  .bullet {
+    display: flex;
+    align-items: baseline;
+    gap: 1.6vw;
+  }
+
+  .bullet .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    transform: translateY(-6px);
+  }
+
+  .bullet .text {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: var(--type-title);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+
+  /* Solution slide */
+  h2.title {
+    margin: 0 0 3vh;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: var(--type-title);
+    font-weight: 700;
+    color: var(--ink);
+    max-width: 50%;
+  }
+
+  .solution-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    margin-bottom: 4vh;
+  }
+
+  .solution-notes div {
+    font-size: var(--type-body);
+    color: var(--ink-soft);
+  }
+
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+    flex-wrap: wrap;
+    margin-top: 60px;
+  }
+
+  .flow .step {
+    background: var(--bg-alt);
+    border-radius: 12px;
+    padding: 1.4vh 1.6vw;
+    font-size: var(--type-small);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .flow .step.final {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .flow .arrow {
+    color: var(--accent);
+    font-size: var(--type-small);
+  }
+
+  /* Demo slide */
+  .demo-flow {
+    margin-top: 3vh;
+    display: flex;
+    align-items: center;
+    gap: 1.6vw;
+    font-size: var(--type-title);
+    font-weight: 700;
+    color: var(--bg-alt);
+  }
+
+  .demo-flow .arrow {
+    color: var(--accent);
+  }
+
+  /* Nav controls */
+  .nav {
+    position: fixed;
+    bottom: 3vh;
+    right: var(--pad-x);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .nav button {
+    background: rgba(0, 0, 0, 0.55);
+    color: #eceee8;
+    border: none;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .nav button:hover {
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  .nav .counter {
+    color: #eceee8;
+    background: rgba(0, 0, 0, 0.55);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 46px;
+    min-height: 36px;
+    text-align: center;
+    align-content: center;
+  }
+
+  @media print {
+    .nav {
+      display: none;
+    }
+
+    section.slide {
+      display: flex !important;
+      position: relative;
+      page-break-after: always;
+      height: 100vh;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <section class="slide is-active" data-label="Title">
+    <div class="bars">
+      <div style="height:40%"></div><div style="height:70%"></div><div style="height:30%"></div>
+      <div style="height:90%"></div><div style="height:50%"></div><div style="height:100%"></div>
+      <div style="height:60%"></div><div style="height:35%"></div><div style="height:80%"></div>
+      <div style="height:45%"></div><div style="height:65%"></div><div style="height:25%"></div>
+      <div style="height:55%"></div><div style="height:95%"></div><div style="height:40%"></div>
+      <div style="height:70%"></div><div style="height:20%"></div><div style="height:85%"></div>
+      <div style="height:50%"></div><div style="height:30%"></div>
+    </div>
+    <div class="eyebrow">The Quality of the Question</div>
+    <h1 class="display">AI Podcast Studio</h1>
+    <p class="subtitle">A content generation engine designed to transform content assets into podcast audio</p>
+  </section>
+
+  <section class="slide" data-label="Team">
+    <div class="eyebrow">Team</div>
+    <div class="team-row">
+      <div class="team-card">
+        <img src="img_ph.png" alt="Paola Hintze">
+        <div class="team-name">Paola Hintze</div>
+        <div class="team-role">Content Strategy, UI &amp; Frontend</div>
+      </div>
+      <div class="team-card">
+        <img src="img_mw.png" alt="Maja Wiegand">
+        <div class="team-name">Maja Wiegand</div>
+        <div class="team-role">UI &amp; Frontend Development</div>
+      </div>
+      <div class="team-card">
+        <img src="img_ja.png" alt="John Adams">
+        <div class="team-name">John Adams</div>
+        <div class="team-role">Backend Development</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide alt-bg" data-label="Problem">
+    <div class="eyebrow">Problem</div>
+    <div class="bullets">
+      <div class="bullet"><div class="dot"></div><div class="text">Your content is sitting in one format</div></div>
+      <div class="bullet"><div class="dot"></div><div class="text">Repurposing it takes manual work</div></div>
+      <div class="bullet"><div class="dot"></div><div class="text">Audiences increasingly prefer audio: hands free, on the go</div></div>
+      <div class="bullet"><div class="dot"></div><div class="text">Existing assets sit idle instead of activating on different channels</div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Solution">
+    <div class="eyebrow">Solution</div>
+    <h2 class="title">Turn existing content into audio – automatically</h2>
+    <div class="solution-notes">
+      <div>A repeatable content pipeline, not a one off podcast</div>
+      <div>Works with books, blogs, marketing assets, training material</div>
+      <div>New formats and new reach, without new writing</div>
+    </div>
+    <div class="flow">
+      <div class="step">Text in</div>
+      <div class="arrow">→</div>
+      <div class="step">Prompt does its magic</div>
+      <div class="arrow">→</div>
+      <div class="step">Human in the loop</div>
+      <div class="arrow">→</div>
+      <div class="step final">Audio + transcript</div>
+    </div>
+  </section>
+
+  <section class="slide dark-bg" data-label="Demo" style="align-items:center;">
+    <div class="bars center">
+      <div style="height:30%"></div><div style="height:65%"></div><div style="height:45%"></div>
+      <div style="height:90%"></div><div style="height:55%"></div><div style="height:100%"></div>
+      <div style="height:40%"></div><div style="height:70%"></div><div style="height:25%"></div>
+      <div style="height:80%"></div><div style="height:50%"></div><div style="height:60%"></div>
+    </div>
+    <div class="eyebrow" style="text-align:center;">Live demo</div>
+    <h1 class="display">Watch it work</h1>
+    <div class="demo-flow">
+      <span>Input</span>
+      <span class="arrow">→</span>
+      <span>Output</span>
+    </div>
+  </section>
+
+  <section class="slide" data-label="Q&A" style="align-items:center; text-align:center;">
+    <h1 class="display" style="max-width:none;">Thank you</h1>
+    <p class="subtitle" style="max-width:none;">Questions?</p>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prevBtn" aria-label="Previous slide">‹</button>
+  <div class="counter"><span id="current">1</span> / <span id="total">6</span></div>
+  <button id="nextBtn" aria-label="Next slide">›</button>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const currentEl = document.getElementById("current");
+  const totalEl = document.getElementById("total");
+  let index = 0;
+
+  totalEl.textContent = slides.length;
+
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle("is-active", n === index));
+    currentEl.textContent = index + 1;
+  }
+
+  document.getElementById("prevBtn").addEventListener("click", () => show(index - 1));
+  document.getElementById("nextBtn").addEventListener("click", () => show(index + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) show(index + 1);
+    if (["ArrowLeft", "PageUp"].includes(e.key)) show(index - 1);
+  });
+
+  let touchStartX = null;
+  document.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx > 50) show(index - 1);
+    if (dx < -50) show(index + 1);
+    touchStartX = null;
+  });
+
+  show(0);
+})();
+</script>
+
+</body>
+</html>
