@@ -183,6 +183,7 @@ footer {
 
 textarea {
   width: 100%;
+  max-width: 100%;
   min-height: 390px;
   padding: 18px;
   border: 1px solid var(--line);
@@ -444,6 +445,7 @@ audio { width: 100%; }
   overflow: hidden;
   background: var(--accent) !important;
   color: var(--white);
+  padding: 32px;
 }
 
 .question-card > span {
