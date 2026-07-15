@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Quality of the Question | AI Podcast Studio Lab</title>
+  <meta name="description" content="Interactive AI Podcast Studio Lab for The Quality of the Question." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div>
+        <strong>The Quality of the Question</strong>
+        <span class="topbar__subtitle">AI Podcast Studio Lab</span>
+      </div>
+      <nav class="topbar__nav" aria-label="Primary navigation">
+        <a href="#studio">Studio</a>
+        <a href="#review">Review</a>
+        <a href="#audio">Audio</a>
+        <a href="https://github.com/paolahsp/The-Quality-of-the-Question-AI-Podcast-Studio" target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" id="studio">
+      <div>
+        <p class="eyebrow">Interactive laboratory · Demo mode</p>
+        <h1>Turn authorized book content into a reviewed podcast script and narrated audio.</h1>
+        <p class="intro__copy">
+          Work from source to script, complete the human review, then unlock narration.
+          The complete manuscript remains private.
+        </p>
+      </div>
+      <div class="pipeline" aria-label="Workflow status">
+        <div class="pipeline__step is-active" data-step="source">01 Source</div>
+        <div class="pipeline__line"></div>
+        <div class="pipeline__step" data-step="script">02 Script</div>
+        <div class="pipeline__line"></div>
+        <div class="pipeline__step" data-step="review">03 Review</div>
+        <div class="pipeline__line"></div>
+        <div class="pipeline__step" data-step="audio">04 Audio</div>
+      </div>
+    </section>
+
+    <section class="workspace two-column">
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Input</p>
+            <h2>1. Authorized Source</h2>
+          </div>
+          <span id="sourceStats" class="meta">0 words · 0 characters</span>
+        </div>
+
+        <p class="helper">Only authorized editorial material should be used in this studio.</p>
+
+        <textarea id="sourceInput" aria-label="Authorized source input" placeholder="Paste an authorized excerpt here..."></textarea>
+
+        <div class="actions">
+          <button class="button button--secondary" id="loadSourceButton" type="button">Load Book Sample</button>
+          <button class="button button--secondary" id="clearSourceButton" type="button">Clear</button>
+          <button class="button button--primary" id="generateScriptButton" type="button">Generate Podcast Script</button>
+        </div>
+
+        <div class="config-grid">
+          <label>
+            Episode title
+            <input id="episodeTitle" value="Why Better Questions Build Better Businesses" />
+          </label>
+          <label>
+            Audience
+            <input id="audience" value="Students and early-stage entrepreneurs" />
+          </label>
+          <label>
+            Tone
+            <select id="tone">
+              <option selected>Reflective and conversational</option>
+              <option>Clear and analytical</option>
+              <option>Warm and direct</option>
+            </select>
+          </label>
+          <label>
+            Target duration
+            <select id="duration">
+              <option>2–3 minutes</option>
+              <option selected>4–5 minutes</option>
+              <option>6–8 minutes</option>
+            </select>
+          </label>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Output</p>
+            <h2>2. Podcast Script</h2>
+          </div>
+          <div class="meta-group">
+            <span id="scriptVersion">v1.0</span>
+            <span id="scriptStats">0 words · ~0:00</span>
+          </div>
+        </div>
+
+        <p class="helper" id="scriptModeMessage">Generate a script to begin editorial review.</p>
+
+        <textarea id="scriptOutput" aria-label="Editable podcast script" placeholder="The generated or approved demo script will appear here..."></textarea>
+
+        <div class="actions">
+          <button class="button button--secondary" id="copyScriptButton" type="button">Copy</button>
+          <button class="button button--secondary" id="resetScriptButton" type="button">Reset</button>
+          <button class="button button--secondary" id="downloadScriptButton" type="button">Download .md</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="review-section" id="review" aria-labelledby="reviewTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Human in the loop</p>
+          <h2 id="reviewTitle">3. Human Review Workspace</h2>
+          <p>Verify the final script before narration. This is a manual editorial review, not automated fact-checking.</p>
+        </div>
+        <span id="reviewStatus" class="status status--neutral" role="status" aria-live="polite">Not Started</span>
+      </div>
+
+      <div id="reviewLocked" class="locked-message">
+        Generate or load a podcast script to begin human review.
+      </div>
+
+      <div id="reviewContent" class="review-grid is-disabled" aria-disabled="true">
+        <div class="criteria" id="criteriaList"></div>
+
+        <aside class="review-sidebar">
+          <label class="field-label" for="reviewerNotes">Reviewer Notes</label>
+          <textarea id="reviewerNotes" placeholder="Record corrections, unsupported claims, pacing issues, or editorial changes..."></textarea>
+
+          <div class="review-summary">
+            <div><strong id="summaryCompleted">0/8</strong><span>Completed</span></div>
+            <div><strong id="summaryPassed">0</strong><span>Passed</span></div>
+            <div><strong id="summaryRevision">0</strong><span>Revise</span></div>
+          </div>
+
+          <div class="actions actions--stack">
+            <button class="button button--secondary" id="compareButton" type="button">Compare with Source</button>
+            <button class="button button--secondary danger" id="requestChangesButton" type="button">Request Changes</button>
+          </div>
+
+          <label class="confirmation">
+            <input type="checkbox" id="finalConfirmation" />
+            <span>I reviewed the final script version and confirm it is ready for narration.</span>
+          </label>
+
+          <button class="button button--primary full-width" id="approveButton" type="button" disabled>
+            Approve for Narration
+          </button>
+
+          <div class="approval-meta" id="approvalMeta" hidden></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="audio-section" id="audio">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Narration</p>
+          <h2>4. Audio Synthesis Workspace</h2>
+          <p id="audioLockMessage">Complete the human review and approve the final script before narration.</p>
+        </div>
+        <span id="audioStatus" class="status status--neutral">Locked</span>
+      </div>
+
+      <div id="audioWorkspace" class="audio-workspace is-disabled" aria-disabled="true">
+        <label>
+          Narrator voice
+          <select id="voiceSelector">
+            <option>Narrator A — Reflective</option>
+            <option>Narrator B — Clear</option>
+            <option>Narrator C — Warm</option>
+          </select>
+        </label>
+
+        <div class="actions">
+          <button class="button button--secondary" id="loadDemoAudioButton" type="button">Load Demo Audio</button>
+          <a class="button button--primary" id="openGradioButton" href="http://127.0.0.1:7860" target="_blank" rel="noreferrer">
+            Open Live Gradio Studio
+          </a>
+        </div>
+
+        <audio id="audioPlayer" controls preload="metadata" hidden></audio>
+        <p id="audioMessage" class="helper">No audio has been loaded yet.</p>
+
+        <div class="actions">
+          <a id="downloadAudioLink" class="button button--secondary is-disabled-link" href="#" download>Download Audio</a>
+          <button class="button button--secondary" id="downloadTranscriptButton" type="button">Download Transcript</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="context-grid">
+      <article>
+        <p class="eyebrow">How this lab works</p>
+        <h2>Source → Script → Review → Audio</h2>
+        <ol class="workflow-list">
+          <li><strong>Authorized Source</strong><span>Select or paste approved editorial content.</span></li>
+          <li><strong>Script Transformation</strong><span>Demo mode loads the approved script; live generation belongs in Gradio.</span></li>
+          <li><strong>Human Review</strong><span>Check accuracy, attribution, tone, pacing, and privacy.</span></li>
+          <li><strong>Narration</strong><span>Only an approved script can move to audio.</span></li>
+        </ol>
+      </article>
+
+      <article class="question-card">
+        <span aria-hidden="true">?</span>
+        <p class="eyebrow">Reflection</p>
+        <h2>What question are you currently avoiding because the answer might force you to change direction?</h2>
+        <textarea id="reflectionInput" placeholder="Write a private reflection. It remains in this browser session only."></textarea>
+        <button class="button button--secondary" id="clearReflectionButton" type="button">Clear Reflection</button>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>The Quality of the Question</strong> · AI Podcast Studio</p>
+    <p>Created by Paola Hintze, Marja, and John.</p>
+    <p>© 2026 Paola Hintze. All rights reserved.</p>
+    <p>This prototype uses only authorized editorial material. The complete book manuscript remains private.</p>
+  </footer>
+
+  <dialog id="comparisonDialog">
+    <form method="dialog" class="dialog-shell">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">Manual comparison</p>
+          <h2>Authorized Source vs. Current Script</h2>
+        </div>
+        <button class="icon-button" value="close" aria-label="Close comparison">×</button>
+      </div>
+      <p class="helper">No automated fact-checking is being performed in this view.</p>
+      <div class="comparison-grid">
+        <article>
+          <h3>Authorized Source</h3>
+          <pre id="comparisonSource"></pre>
+        </article>
+        <article>
+          <h3>Current Script</h3>
+          <pre id="comparisonScript"></pre>
+        </article>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script src="./script.js"></script>
+</body>
+</html>
