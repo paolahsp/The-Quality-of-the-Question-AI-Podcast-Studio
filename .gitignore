@@ -7,32 +7,27 @@
 .venv/
 venv/
 env/
-
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
-
 # Test and development caches
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
 # Jupyter
 .ipynb_checkpoints/
-
 # Generated podcast files
 outputs/*
 !outputs/.gitkeep
 *.mp3
 *.wav
-
 # Private manuscript content
 private_content/
-
 # Local Visual Studio Code settings
 .vscode/
-
 # Operating system files
 .DS_Store
 Thumbs.db
+# Local full source backups
+data/source_texts/*_full.md
