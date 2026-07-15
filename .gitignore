@@ -17,11 +17,7 @@ __pycache__/
 .ruff_cache/
 # Jupyter
 .ipynb_checkpoints/
-# Generated podcast files
-outputs/*
-!outputs/.gitkeep
-*.mp3
-*.wav
+# Generated podcast files (tracked so sample audio/transcripts can be committed)
 # Private manuscript content
 private_content/
 # Local Visual Studio Code settings
