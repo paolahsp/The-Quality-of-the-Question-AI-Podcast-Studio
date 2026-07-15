@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import threading
 import webbrowser
@@ -24,9 +25,11 @@ import gradio as gr
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
 
 from src.podcast_pipeline import (
     format_podcast_script,
+    generate_audio_bytes,
     generate_podcast_script,
 )
 
@@ -63,6 +66,20 @@ GENERATED_OUTPUTS_DIR = (
     / "outputs"
     / "generated"
 )
+
+
+class ScriptGenerationRequest(BaseModel):
+    """Payload received from the single-page studio."""
+
+    source_text: str = Field(min_length=1, max_length=25_000)
+
+
+class AudioGenerationRequest(BaseModel):
+    """Approved narration payload received from the studio."""
+
+    script_text: str = Field(min_length=1)
+    voice: str = "nova"
+    approved: bool = False
 
 # Keep frontend files in ``landing/``. For compatibility with an earlier flat
 # layout, the project root is also checked automatically.
@@ -543,34 +560,43 @@ def save_transcript(
     )
 
 
-def load_demo_audio(
+def generate_approved_audio(
+    script_text: str,
     is_approved: bool,
 ) -> tuple[str | None, str]:
-    """
-    Load the authorized demo audio after script approval.
-    """
+    """Generate narration from the current approved script."""
     if not is_approved:
         return (
             None,
             (
                 "❌ Complete the human review and approve "
-                "the script before loading audio."
+                "the script before generating audio."
             ),
         )
 
-    if not DEMO_AUDIO_FILE.exists():
+    if not script_text or not script_text.strip():
         return (
             None,
-            (
-                "⚠️ Demo audio was not found. Generate the "
-                "MP3 later and save it at:\n\n"
-                "`outputs/demo/book_intro_podcast.mp3`"
-            ),
+            "❌ The approved script is empty.",
+        )
+
+    try:
+        audio_bytes = generate_audio_bytes(script_text, voice="nova")
+        GENERATED_OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        audio_file = GENERATED_OUTPUTS_DIR / f"podcast_{timestamp}.mp3"
+        transcript_file = GENERATED_OUTPUTS_DIR / f"podcast_{timestamp}.md"
+        audio_file.write_bytes(audio_bytes)
+        transcript_file.write_text(script_text, encoding="utf-8")
+    except Exception as error:
+        return (
+            None,
+            f"❌ Audio generation failed: {error}",
         )
 
     return (
-        str(DEMO_AUDIO_FILE),
-        "✅ Authorized demo audio loaded.",
+        str(audio_file),
+        "✅ Approved narration generated successfully.",
     )
 
 
@@ -822,9 +848,12 @@ with gr.Blocks(
         with gr.Column():
             review_summary = gr.Markdown(
                 """
-                **Completed:** 0/8  
-                **Passed:** 0  
-                **Needs revision:** 0  
+                **Completed:** 0/8
+
+                **Passed:** 0
+
+                **Needs revision:** 0
+
                 **Not applicable:** 0
                 """
             )
@@ -889,7 +918,7 @@ with gr.Blocks(
             )
 
             load_audio_button = gr.Button(
-                "Load Authorized Demo Audio",
+                "Generate Approved Audio",
                 variant="primary",
             )
 
@@ -1081,8 +1110,8 @@ with gr.Blocks(
     )
 
     load_audio_button.click(
-        fn=load_demo_audio,
-        inputs=[approval_state],
+        fn=generate_approved_audio,
+        inputs=[script_text, approval_state],
         outputs=[
             audio_player,
             audio_status,
@@ -1139,34 +1168,90 @@ def landing_script() -> FileResponse:
     )
 
 
-@web_app.get("/api/demo/source", include_in_schema=False)
-def demo_source_api() -> dict[str, str]:
-    """Return the authorized demo source used by both interfaces."""
+@web_app.get("/api/source", include_in_schema=False)
+def authorized_source_api() -> dict[str, str]:
+    """Return the authorized book source used by the studio."""
     return {"text": read_text_file(SOURCE_FILE)}
 
 
-@web_app.get("/api/demo/script", include_in_schema=False)
-def demo_script_api() -> dict[str, str]:
-    """Return the approved demo script used by both interfaces."""
-    return {"text": read_text_file(SCRIPT_FILE)}
-
-
-@web_app.get("/demo-audio", include_in_schema=False)
-def demo_audio() -> FileResponse:
-    """Serve the approved demo MP3 without exposing the output directory."""
-    if not DEMO_AUDIO_FILE.is_file():
+@web_app.post("/api/generate-script", include_in_schema=False)
+def generate_script_api(
+    request: ScriptGenerationRequest,
+) -> dict[str, str]:
+    """Generate a structured podcast script from authorized source text."""
+    try:
+        podcast_script = generate_podcast_script(request.source_text)
+        script_text = format_podcast_script(podcast_script)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except Exception as error:
         raise HTTPException(
-            status_code=404,
-            detail=(
-                "Demo audio not found. Add "
-                "outputs/demo/book_intro_podcast.mp3 first."
-            ),
+            status_code=502,
+            detail=f"OpenAI script generation failed: {error}",
+        ) from error
+
+    return {"script": script_text}
+
+
+@web_app.post("/api/generate-audio", include_in_schema=False)
+def generate_audio_api(
+    request: AudioGenerationRequest,
+) -> FileResponse:
+    """Generate and save narration from the current approved script."""
+    if not request.approved:
+        raise HTTPException(
+            status_code=403,
+            detail="The current script must be approved before narration.",
         )
 
+    allowed_voices = {"alloy", "nova", "shimmer"}
+    if request.voice not in allowed_voices:
+        raise HTTPException(status_code=400, detail="Unsupported narrator voice.")
+
+    try:
+        audio_bytes = generate_audio_bytes(
+            request.script_text,
+            voice=request.voice,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+    except Exception as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"OpenAI audio generation failed: {error}",
+        ) from error
+
+    GENERATED_OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    audio_file = GENERATED_OUTPUTS_DIR / f"podcast_{timestamp}.mp3"
+    transcript_file = GENERATED_OUTPUTS_DIR / f"podcast_{timestamp}.md"
+    metadata_file = GENERATED_OUTPUTS_DIR / f"podcast_{timestamp}.json"
+
+    try:
+        audio_file.write_bytes(audio_bytes)
+        transcript_file.write_text(request.script_text, encoding="utf-8")
+        metadata_file.write_text(
+            json.dumps(
+                {
+                    "generated_at": datetime.now().isoformat(timespec="seconds"),
+                    "voice": request.voice,
+                    "script": request.script_text,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+    except OSError as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Generated files could not be saved: {error}",
+        ) from error
+
     return FileResponse(
-        DEMO_AUDIO_FILE,
+        audio_file,
         media_type="audio/mpeg",
-        filename=DEMO_AUDIO_FILE.name,
+        filename="quality_of_the_question_podcast.mp3",
     )
 
 
