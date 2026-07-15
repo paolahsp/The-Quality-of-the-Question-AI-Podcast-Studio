@@ -1,558 +1,513 @@
-:root {
-  --surface: #fbf9f8;
-  --surface-low: #f5f3f3;
-  --surface-mid: #efeded;
-  --surface-high: #e4e2e2;
-  --ink: #1b1c1c;
-  --muted: #5e5e5b;
-  --line: #c4c7c7;
-  --accent: #2d4a53;
-  --danger: #93000a;
-  --danger-bg: #ffdad6;
-  --white: #ffffff;
-  --max: 1280px;
-}
-
-* { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  margin: 0;
-  color: var(--ink);
-  background: var(--surface);
-  font-family: "Inter", sans-serif;
-  line-height: 1.55;
-}
-
-h1, h2, h3 {
-  margin: 0;
-  font-family: "Playfair Display", serif;
-  line-height: 1.16;
-}
-
-h1 { font-size: clamp(2.2rem, 5vw, 4.4rem); max-width: 16ch; }
-h2 { font-size: clamp(1.55rem, 3vw, 2.15rem); }
-h3 { font-size: 1.15rem; }
-
-a { color: inherit; }
-
-button, input, textarea, select { font: inherit; }
-
-button, .button, input, textarea, select {
-  border-radius: 0;
-}
-
-button:focus-visible, a:focus-visible, input:focus-visible,
-textarea:focus-visible, select:focus-visible {
-  outline: 3px solid rgba(45, 74, 83, 0.28);
-  outline-offset: 2px;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  border-bottom: 1px solid var(--line);
-  background: rgba(251, 249, 248, 0.97);
-}
-
-.topbar__inner {
-  max-width: var(--max);
-  min-height: 64px;
-  margin: 0 auto;
-  padding: 0 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.topbar__subtitle {
-  margin-left: 12px;
-  color: var(--muted);
-  font-size: 0.82rem;
-}
-
-.topbar__nav {
-  display: flex;
-  gap: 24px;
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.topbar__nav a { text-decoration: none; }
-.topbar__nav a:hover { color: var(--accent); }
-
-main > section,
-footer {
-  max-width: var(--max);
-  margin: 0 auto;
-  padding-left: 32px;
-  padding-right: 32px;
-}
-
-.intro {
-  padding-top: 64px;
-  padding-bottom: 42px;
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 1.35fr 1fr;
-  gap: 48px;
-  align-items: end;
-}
-
-.intro__copy {
-  max-width: 62ch;
-  color: var(--muted);
-  font-size: 1.05rem;
-}
-
-.eyebrow,
-.meta,
-.meta-group,
-.field-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-
-.pipeline {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-}
-
-.pipeline__step {
-  color: #929494;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.pipeline__step.is-active { color: var(--accent); }
-.pipeline__line { width: 38px; height: 1px; background: var(--line); }
-
-.workspace {
-  padding-top: 48px;
-  padding-bottom: 48px;
-}
-
-.two-column {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-}
-
-.panel,
-.review-section,
-.audio-section,
-.context-grid article {
-  border: 1px solid var(--line);
-  background: var(--white);
-}
-
-.panel { padding: 26px; }
-
-.panel__header,
-.section-heading,
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  margin-bottom: 18px;
-}
-
-.meta-group {
-  display: flex;
-  gap: 14px;
-  color: var(--muted);
-}
-
-.helper {
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-textarea {
-  width: 100%;
-  min-height: 390px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  background: var(--surface-low);
-  color: var(--ink);
-  resize: vertical;
-}
-
-input, select {
-  width: 100%;
-  padding: 11px 12px;
-  border: 1px solid var(--line);
-  background: var(--white);
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.actions--stack { flex-direction: column; }
-
-.button {
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 42px;
-  padding: 10px 16px;
-  border: 1px solid var(--ink);
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 0.73rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.button--primary {
-  background: var(--ink);
-  color: var(--white);
-}
-
-.button--secondary {
-  background: var(--white);
-  color: var(--ink);
-}
-
-.button:hover { border-color: var(--accent); }
-.button--primary:hover { background: var(--accent); }
-
-.button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.full-width { width: 100%; }
-
-.danger:hover {
-  color: var(--danger);
-  border-color: var(--danger);
-  background: var(--danger-bg);
-}
-
-.config-grid {
-  margin-top: 22px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.config-grid label,
-.audio-workspace label {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.review-section,
-.audio-section {
-  margin-top: 20px;
-  margin-bottom: 48px;
-  padding: 30px;
-}
-
-.section-heading p {
-  max-width: 70ch;
-  margin-bottom: 0;
-  color: var(--muted);
-}
-
-.status {
-  border: 1px solid var(--line);
-  padding: 7px 12px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.status--neutral { color: var(--muted); }
-.status--ready { color: var(--accent); border-color: var(--accent); }
-.status--danger { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); }
-.status--approved { color: var(--white); border-color: var(--accent); background: var(--accent); }
-
-.locked-message {
-  padding: 18px;
-  border: 1px dashed var(--line);
-  color: var(--muted);
-  background: var(--surface-low);
-}
-
-.review-grid {
-  display: grid;
-  grid-template-columns: 1.45fr 0.75fr;
-  gap: 28px;
-}
-
-.is-disabled {
-  opacity: 0.42;
-  pointer-events: none;
-  filter: grayscale(0.4);
-}
-
-.criterion {
-  padding: 16px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.criterion__top {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px;
-  align-items: center;
-}
-
-.criterion p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.segmented {
-  display: flex;
-  gap: 6px;
-}
-
-.segmented input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.segmented label {
-  padding: 7px 9px;
-  border: 1px solid var(--line);
-  cursor: pointer;
-  font-size: 0.66rem;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.segmented input:checked + label {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--white);
-}
-
-.segmented input[value="revision"]:checked + label {
-  background: var(--danger);
-  border-color: var(--danger);
-}
-
-.review-sidebar {
-  padding: 20px;
-  background: var(--surface-low);
-  border: 1px solid var(--line);
-}
-
-.review-sidebar textarea {
-  min-height: 150px;
-  background: var(--white);
-}
-
-.review-summary {
-  margin: 18px 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: 1px solid var(--line);
-  background: var(--white);
-}
-
-.review-summary div {
-  padding: 14px 8px;
-  text-align: center;
-  border-right: 1px solid var(--line);
-}
-
-.review-summary div:last-child { border-right: 0; }
-.review-summary strong { display: block; font-size: 1.2rem; }
-.review-summary span { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; }
-
-.confirmation {
-  margin: 18px 0;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  font-size: 0.8rem;
-}
-
-.confirmation input { width: 18px; margin-top: 3px; }
-
-.approval-meta {
-  margin-top: 14px;
-  padding: 12px;
-  border-left: 3px solid var(--accent);
-  background: var(--white);
-  font-size: 0.78rem;
-}
-
-.audio-workspace {
-  display: grid;
-  gap: 18px;
-}
-
-audio { width: 100%; }
-
-.is-disabled-link {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.context-grid {
-  padding-top: 10px;
-  padding-bottom: 64px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-}
-
-.context-grid article { padding: 28px; }
-
-.workflow-list {
-  display: grid;
-  gap: 14px;
-  padding-left: 20px;
-}
-
-.workflow-list li span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.86rem;
-}
-
-.question-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--accent) !important;
-  color: var(--white);
-}
-
-.question-card > span {
-  position: absolute;
-  right: 20px;
-  top: -52px;
-  opacity: 0.09;
-  font-family: "Playfair Display", serif;
-  font-size: 16rem;
-}
-
-.question-card .eyebrow { color: var(--white); }
-.question-card textarea {
-  min-height: 130px;
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.35);
-  color: var(--white);
-}
-
-footer {
-  padding-top: 32px;
-  padding-bottom: 48px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.78rem;
-  text-align: center;
-}
-
-dialog {
-  width: min(1100px, calc(100% - 32px));
-  max-height: calc(100vh - 32px);
-  border: 1px solid var(--ink);
-  padding: 0;
-}
-
-dialog::backdrop { background: rgba(27, 28, 28, 0.52); }
-
-.dialog-shell { padding: 24px; }
-
-.icon-button {
-  border: 0;
-  background: transparent;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
-.comparison-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
-
-.comparison-grid article {
-  min-width: 0;
-  border: 1px solid var(--line);
-  padding: 18px;
-  background: var(--surface-low);
-}
-
-.comparison-grid pre {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  font-family: "Inter", sans-serif;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  max-height: 55vh;
-  overflow-y: auto;
-}
-
-.toast {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 100;
-  max-width: 360px;
-  padding: 14px 18px;
-  border: 1px solid var(--ink);
-  background: var(--white);
-  box-shadow: 6px 6px 0 rgba(27,28,28,0.14);
-}
-
-@media (max-width: 900px) {
-  .intro,
-  .two-column,
-  .review-grid,
-  .context-grid,
-  .comparison-grid {
-    grid-template-columns: 1fr;
+(() => {
+  "use strict";
+
+  const SAMPLE_SOURCE = `The quality of the question determines the quality of the answer.
+
+In business, teams often move too quickly toward solutions. They ask how to execute an idea before asking whether they are solving the right problem. Better questions slow the rush to certainty just enough to reveal assumptions, missing voices, and new possibilities.
+
+A useful question does more than collect information. It creates movement. It helps a team see the emotional, contextual, and systemic dimensions of a challenge before defining the problem it intends to solve.`;
+
+  const SAMPLE_SCRIPT = `# Why Better Questions Build Better Businesses
+
+## Opening
+
+What if the most expensive mistake in a project is not a bad answer, but a question that was never examined?
+
+## Introduction
+
+Welcome to The Quality of the Question, a podcast studio for people who want to think more clearly before they act. In this episode, we explore why stronger questions help students, entrepreneurs, and teams discover the real challenge behind the obvious one.
+
+## Core Idea
+
+Teams often begin with execution: How can we build this? How can we launch faster? How can we convince people to use it? Those questions may sound productive, but they already contain assumptions about the solution, the audience, and the problem.
+
+A better starting point is to ask what we may be taking for granted. Who experiences this problem? In what context? What emotional or systemic forces shape it? These questions do not delay progress. They protect the project from moving quickly in the wrong direction.
+
+## Practical Example
+
+Imagine a team building a new service for early-stage entrepreneurs. The team might first ask, “How do we add more features?” A stronger question could be, “At what moment do entrepreneurs feel least certain about their next decision, and what kind of support would help them move forward?” The second question changes what the team notices and what it may choose to build.
+
+## Reflection Question
+
+What question are you currently avoiding because the answer might force you to change direction?
+
+## Weekly Action
+
+Choose one active project. Write down the question guiding it today. Then identify one assumption hidden inside that question and rewrite it so that it opens a new path of inquiry.
+
+## Closing
+
+Better answers are useful. Better questions change what becomes possible.`;
+
+  const REVIEW_CRITERIA = [
+    {
+      id: "source-fidelity",
+      title: "Source Fidelity",
+      description: "The script remains faithful to the authorized source and does not invent claims."
+    },
+    {
+      id: "factual-accuracy",
+      title: "Factual Accuracy",
+      description: "Names, concepts, examples, and statements are accurate."
+    },
+    {
+      id: "attribution",
+      title: "Attribution",
+      description: "Ideas and quotations are attributed appropriately."
+    },
+    {
+      id: "spoken-language",
+      title: "Spoken Language",
+      description: "The wording sounds natural when read aloud."
+    },
+    {
+      id: "tone-audience",
+      title: "Tone and Audience",
+      description: "The tone fits the intended listeners and editorial voice."
+    },
+    {
+      id: "episode-structure",
+      title: "Episode Structure",
+      description: "The opening, explanation, reflection, action, and closing form a clear arc."
+    },
+    {
+      id: "length-pacing",
+      title: "Length and Pacing",
+      description: "The script length and rhythm fit the selected episode duration."
+    },
+    {
+      id: "copyright-privacy",
+      title: "Copyright and Privacy",
+      description: "Only authorized material is included and the complete manuscript remains private."
+    }
+  ];
+
+  const elements = {};
+  const state = {
+    version: 1,
+    approved: false,
+    approvedVersion: null,
+    initialScript: "",
+    review: Object.create(null)
+  };
+
+  const byId = (id) => document.getElementById(id);
+
+  function cacheElements() {
+    [
+      "sourceInput", "sourceStats", "loadSourceButton", "clearSourceButton",
+      "generateScriptButton", "episodeTitle", "audience", "tone", "duration",
+      "scriptOutput", "scriptVersion", "scriptStats", "scriptModeMessage",
+      "copyScriptButton", "resetScriptButton", "downloadScriptButton",
+      "reviewStatus", "reviewLocked", "reviewContent", "criteriaList",
+      "reviewerNotes", "summaryCompleted", "summaryPassed", "summaryRevision",
+      "compareButton", "requestChangesButton", "finalConfirmation", "approveButton",
+      "approvalMeta", "audioLockMessage", "audioStatus", "audioWorkspace",
+      "voiceSelector", "loadDemoAudioButton", "audioPlayer", "audioMessage", "downloadAudioLink",
+      "downloadTranscriptButton", "reflectionInput", "clearReflectionButton",
+      "comparisonDialog", "comparisonSource", "comparisonScript", "toast",
+      "openGradioButton"
+    ].forEach((id) => {
+      elements[id] = byId(id);
+    });
   }
 
-  .pipeline { justify-content: flex-start; overflow-x: auto; padding-bottom: 8px; }
-  .criterion__top { grid-template-columns: 1fr; }
-  .segmented { flex-wrap: wrap; }
-}
-
-@media (max-width: 680px) {
-  .topbar__inner,
-  main > section,
-  footer {
-    padding-left: 18px;
-    padding-right: 18px;
+  function countWords(text) {
+    const cleaned = text.trim();
+    return cleaned ? cleaned.split(/\s+/u).length : 0;
   }
 
-  .topbar__nav a:not(:last-child) { display: none; }
-  .topbar__subtitle { display: block; margin: 2px 0 0; }
-  .intro { padding-top: 38px; }
-  .config-grid { grid-template-columns: 1fr; }
-  .panel__header,
-  .section-heading { flex-direction: column; }
-  .actions .button { width: 100%; }
-  .pipeline__line { width: 20px; }
-}
+  function formatDuration(text) {
+    const totalSeconds = Math.round((countWords(text) / 145) * 60);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  function setStatus(element, text, variant = "neutral") {
+    element.textContent = text;
+    element.className = `status status--${variant}`;
+  }
+
+  function showToast(message) {
+    elements.toast.textContent = message;
+    elements.toast.hidden = false;
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => {
+      elements.toast.hidden = true;
+    }, 2800);
+  }
+
+  function updateSourceStats() {
+    const text = elements.sourceInput.value;
+    elements.sourceStats.textContent = `${countWords(text)} words · ${text.length} characters`;
+    updatePipeline();
+  }
+
+  function updateScriptStats() {
+    const text = elements.scriptOutput.value;
+    elements.scriptStats.textContent = `${countWords(text)} words · ~${formatDuration(text)}`;
+    elements.scriptVersion.textContent = `v${state.version}.0`;
+    updatePipeline();
+  }
+
+  function updatePipeline() {
+    const sourceReady = Boolean(elements.sourceInput.value.trim());
+    const scriptReady = Boolean(elements.scriptOutput.value.trim());
+    const reached = {
+      source: true,
+      script: sourceReady,
+      review: scriptReady,
+      audio: state.approved
+    };
+
+    document.querySelectorAll(".pipeline__step").forEach((step) => {
+      step.classList.toggle("is-active", reached[step.dataset.step]);
+    });
+  }
+
+  function renderCriteria() {
+    elements.criteriaList.replaceChildren();
+
+    REVIEW_CRITERIA.forEach((criterion) => {
+      const article = document.createElement("article");
+      article.className = "criterion";
+
+      const top = document.createElement("div");
+      top.className = "criterion__top";
+
+      const copy = document.createElement("div");
+      const heading = document.createElement("h3");
+      heading.textContent = criterion.title;
+      const description = document.createElement("p");
+      description.textContent = criterion.description;
+      copy.append(heading, description);
+
+      const segmented = document.createElement("div");
+      segmented.className = "segmented";
+      segmented.setAttribute("role", "radiogroup");
+      segmented.setAttribute("aria-label", criterion.title);
+
+      [
+        ["pass", "Pass"],
+        ["revision", "Needs Revision"],
+        ["na", "N/A"]
+      ].forEach(([value, labelText]) => {
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = criterion.id;
+        input.id = `${criterion.id}-${value}`;
+        input.value = value;
+        input.addEventListener("change", () => {
+          state.review[criterion.id] = value;
+          invalidateApproval("Review updated. Approval must match the current review.");
+          updateReviewSummary();
+        });
+
+        const label = document.createElement("label");
+        label.htmlFor = input.id;
+        label.textContent = labelText;
+        segmented.append(input, label);
+      });
+
+      top.append(copy, segmented);
+      article.append(top);
+      elements.criteriaList.append(article);
+    });
+  }
+
+  function unlockReview() {
+    const hasScript = Boolean(elements.scriptOutput.value.trim());
+    elements.reviewLocked.hidden = hasScript;
+    elements.reviewContent.classList.toggle("is-disabled", !hasScript);
+    elements.reviewContent.setAttribute("aria-disabled", String(!hasScript));
+
+    if (!hasScript) {
+      setStatus(elements.reviewStatus, "Not Started", "neutral");
+    } else if (!state.approved) {
+      setStatus(elements.reviewStatus, "In Review", "ready");
+    }
+  }
+
+  function clearReviewSelections() {
+    state.review = Object.create(null);
+    document.querySelectorAll('#criteriaList input[type="radio"]').forEach((input) => {
+      input.checked = false;
+    });
+    elements.finalConfirmation.checked = false;
+    elements.reviewerNotes.value = "";
+    updateReviewSummary();
+  }
+
+  function reviewCounts() {
+    const values = Object.values(state.review);
+    return {
+      completed: values.length,
+      passed: values.filter((value) => value === "pass").length,
+      revision: values.filter((value) => value === "revision").length
+    };
+  }
+
+  function updateReviewSummary() {
+    const counts = reviewCounts();
+    elements.summaryCompleted.textContent = `${counts.completed}/${REVIEW_CRITERIA.length}`;
+    elements.summaryPassed.textContent = String(counts.passed);
+    elements.summaryRevision.textContent = String(counts.revision);
+
+    const canApprove =
+      Boolean(elements.scriptOutput.value.trim()) &&
+      counts.completed === REVIEW_CRITERIA.length &&
+      counts.revision === 0 &&
+      elements.finalConfirmation.checked;
+
+    elements.approveButton.disabled = !canApprove;
+
+    if (!state.approved && counts.completed === REVIEW_CRITERIA.length) {
+      setStatus(
+        elements.reviewStatus,
+        counts.revision ? "Revision Needed" : "Ready to Approve",
+        counts.revision ? "danger" : "ready"
+      );
+    }
+  }
+
+  function lockAudio() {
+    state.approved = false;
+    state.approvedVersion = null;
+    elements.audioWorkspace.classList.add("is-disabled");
+    elements.audioWorkspace.setAttribute("aria-disabled", "true");
+    elements.audioLockMessage.textContent = "Complete the human review and approve the final script before narration.";
+    setStatus(elements.audioStatus, "Locked", "neutral");
+    elements.approvalMeta.hidden = true;
+    elements.audioPlayer.pause();
+    elements.audioPlayer.hidden = true;
+    elements.downloadAudioLink.classList.add("is-disabled-link");
+    elements.downloadAudioLink.removeAttribute("href");
+    elements.audioMessage.textContent = "No audio has been loaded yet.";
+    updatePipeline();
+  }
+
+  function invalidateApproval(message) {
+    if (state.approved) {
+      lockAudio();
+      setStatus(elements.reviewStatus, "Changed After Approval", "danger");
+      if (message) showToast(message);
+    }
+  }
+
+  async function getDemoText(endpoint, fallback) {
+    try {
+      const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      return payload.text && payload.text.trim() ? payload.text : fallback;
+    } catch (_error) {
+      return fallback;
+    }
+  }
+
+  async function loadSource() {
+    elements.loadSourceButton.disabled = true;
+    const text = await getDemoText("/api/demo/source", SAMPLE_SOURCE);
+    elements.sourceInput.value = text;
+    elements.loadSourceButton.disabled = false;
+    updateSourceStats();
+    showToast("Authorized book sample loaded.");
+  }
+
+  function clearSource() {
+    elements.sourceInput.value = "";
+    updateSourceStats();
+    showToast("Source cleared.");
+  }
+
+  async function generateScript() {
+    if (!elements.sourceInput.value.trim()) {
+      showToast("Add or load an authorized source first.");
+      elements.sourceInput.focus();
+      return;
+    }
+
+    elements.generateScriptButton.disabled = true;
+    elements.generateScriptButton.textContent = "Loading Demo Script…";
+    const approvedScript = await getDemoText("/api/demo/script", SAMPLE_SCRIPT);
+    const title = elements.episodeTitle.value.trim() || "Why Better Questions Build Better Businesses";
+    const script = approvedScript.replace(/^#\s+.*$/m, `# ${title}`);
+
+    state.version += 1;
+    state.initialScript = script;
+    elements.scriptOutput.value = script;
+    elements.scriptModeMessage.textContent = `Approved demo script loaded · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value}`;
+    elements.generateScriptButton.disabled = false;
+    elements.generateScriptButton.textContent = "Generate Podcast Script";
+    lockAudio();
+    clearReviewSelections();
+    unlockReview();
+    updateScriptStats();
+    elements.reviewContent.scrollIntoView({ behavior: "smooth", block: "start" });
+    showToast("Demo script ready for human review.");
+  }
+
+  function resetScript() {
+    invalidateApproval();
+    elements.scriptOutput.value = state.initialScript;
+    state.version += 1;
+    clearReviewSelections();
+    unlockReview();
+    updateScriptStats();
+    elements.scriptModeMessage.textContent = state.initialScript
+      ? "Script restored to the last loaded demo version."
+      : "Generate a script to begin editorial review.";
+    showToast("Script reset.");
+  }
+
+  async function copyScript() {
+    const text = elements.scriptOutput.value;
+    if (!text.trim()) {
+      showToast("There is no script to copy.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_error) {
+      elements.scriptOutput.select();
+      document.execCommand("copy");
+      elements.scriptOutput.setSelectionRange(0, 0);
+    }
+    showToast("Script copied to the clipboard.");
+  }
+
+  function downloadText(filename, text, type = "text/markdown;charset=utf-8") {
+    if (!text.trim()) {
+      showToast("There is no content to download.");
+      return;
+    }
+    const blob = new Blob([text], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function openComparison() {
+    elements.comparisonSource.textContent = elements.sourceInput.value || "No source loaded.";
+    elements.comparisonScript.textContent = elements.scriptOutput.value || "No script loaded.";
+    if (typeof elements.comparisonDialog.showModal === "function") {
+      elements.comparisonDialog.showModal();
+    } else {
+      elements.comparisonDialog.setAttribute("open", "");
+    }
+  }
+
+  function requestChanges() {
+    lockAudio();
+    elements.finalConfirmation.checked = false;
+    setStatus(elements.reviewStatus, "Changes Requested", "danger");
+    updateReviewSummary();
+    elements.scriptOutput.focus();
+    showToast("Changes requested. Edit the script, then review it again.");
+  }
+
+  function approveScript() {
+    if (elements.approveButton.disabled) return;
+
+    state.approved = true;
+    state.approvedVersion = state.version;
+    const approvedAt = new Date();
+    elements.audioWorkspace.classList.remove("is-disabled");
+    elements.audioWorkspace.setAttribute("aria-disabled", "false");
+    elements.audioLockMessage.textContent = `Script v${state.version}.0 is approved and ready for narration.`;
+    setStatus(elements.audioStatus, "Unlocked", "approved");
+    setStatus(elements.reviewStatus, "Approved", "approved");
+    elements.approvalMeta.hidden = false;
+    elements.approvalMeta.textContent = `Approved: v${state.version}.0 · ${approvedAt.toLocaleString()}`;
+    updatePipeline();
+    showToast("Script approved. Audio workspace unlocked.");
+  }
+
+  function loadDemoAudio() {
+    if (!state.approved) {
+      showToast("Approve the current script before loading audio.");
+      return;
+    }
+
+    elements.audioMessage.textContent = "Loading demo audio…";
+    elements.audioPlayer.hidden = false;
+    elements.audioPlayer.src = `/demo-audio?v=${Date.now()}`;
+    elements.audioPlayer.load();
+  }
+
+  function configureLiveStudioLink() {
+    const servedByPython = window.location.port === "7860";
+    elements.openGradioButton.href = servedByPython
+      ? `${window.location.origin}/studio/`
+      : "http://127.0.0.1:7860/studio/";
+  }
+
+  function bindEvents() {
+    elements.sourceInput.addEventListener("input", updateSourceStats);
+    elements.scriptOutput.addEventListener("input", () => {
+      invalidateApproval("The script changed, so its approval was removed.");
+      unlockReview();
+      updateScriptStats();
+      updateReviewSummary();
+    });
+    elements.loadSourceButton.addEventListener("click", loadSource);
+    elements.clearSourceButton.addEventListener("click", clearSource);
+    elements.generateScriptButton.addEventListener("click", generateScript);
+    elements.copyScriptButton.addEventListener("click", copyScript);
+    elements.resetScriptButton.addEventListener("click", resetScript);
+    elements.downloadScriptButton.addEventListener("click", () => {
+      downloadText("podcast_script.md", elements.scriptOutput.value);
+    });
+    elements.compareButton.addEventListener("click", openComparison);
+    elements.requestChangesButton.addEventListener("click", requestChanges);
+    elements.finalConfirmation.addEventListener("change", updateReviewSummary);
+    elements.approveButton.addEventListener("click", approveScript);
+    elements.loadDemoAudioButton.addEventListener("click", loadDemoAudio);
+    elements.downloadTranscriptButton.addEventListener("click", () => {
+      downloadText("podcast_transcript.txt", elements.scriptOutput.value, "text/plain;charset=utf-8");
+    });
+    elements.clearReflectionButton.addEventListener("click", () => {
+      elements.reflectionInput.value = "";
+      sessionStorage.removeItem("podcast-studio-reflection");
+      showToast("Reflection cleared.");
+    });
+    elements.reflectionInput.addEventListener("input", () => {
+      sessionStorage.setItem("podcast-studio-reflection", elements.reflectionInput.value);
+    });
+    elements.audioPlayer.addEventListener("canplay", () => {
+      elements.audioMessage.textContent = `Demo audio ready · ${elements.voiceSelector?.value || "Selected narrator"}`;
+      elements.downloadAudioLink.href = "/demo-audio";
+      elements.downloadAudioLink.download = "book_intro_podcast.mp3";
+      elements.downloadAudioLink.classList.remove("is-disabled-link");
+      setStatus(elements.audioStatus, "Audio Ready", "approved");
+    });
+    elements.audioPlayer.addEventListener("error", () => {
+      elements.audioPlayer.hidden = true;
+      elements.audioMessage.textContent = "Demo audio was not found. Add outputs/demo/book_intro_podcast.mp3 and try again.";
+      setStatus(elements.audioStatus, "Audio Missing", "danger");
+      showToast("Demo audio file not found.");
+    });
+  }
+
+  function initialize() {
+    cacheElements();
+    renderCriteria();
+    bindEvents();
+    configureLiveStudioLink();
+    elements.reflectionInput.value = sessionStorage.getItem("podcast-studio-reflection") || "";
+    updateSourceStats();
+    updateScriptStats();
+    unlockReview();
+    updateReviewSummary();
+    lockAudio();
+  }
+
+  document.addEventListener("DOMContentLoaded", initialize);
+})();
