@@ -372,12 +372,11 @@ Better answers are useful. Better questions change what becomes possible.`;
       state.version += 1;
       state.initialScript = script;
       elements.scriptOutput.value = script;
-      elements.scriptModeMessage.textContent = `Generated from authorized source · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value}`;
+      elements.scriptModeMessage.textContent = `Generated from authorized source · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value} · Move on to Step 3 below to customize your podcast script`;
       lockAudio();
       clearReviewSelections();
       unlockReview();
       updateScriptStats();
-      elements.reviewContent.scrollIntoView({ behavior: "smooth", block: "start" });
       showToast("Podcast script ready for human review.");
     } catch (error) {
       elements.scriptModeMessage.textContent = `Script generation failed: ${error.message}`;

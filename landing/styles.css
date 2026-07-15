@@ -15,7 +15,10 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
 
 body {
   margin: 0;
@@ -23,6 +26,7 @@ body {
   background: var(--surface);
   font-family: "Inter", sans-serif;
   line-height: 1.55;
+  overflow-x: hidden;
 }
 
 h1, h2, h3 {
@@ -147,10 +151,19 @@ footer {
 .two-column {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  background: var(--white);
 }
 
-.panel,
+.two-column > * {
+  min-width: 0;
+}
+
+.two-column .panel:first-child {
+  border-right: 1px solid var(--line);
+}
+
 .review-section,
 .audio-section,
 .context-grid article {
