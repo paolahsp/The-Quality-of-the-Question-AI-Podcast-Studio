@@ -27,3 +27,7 @@ private_content/
 Thumbs.db
 # Local full source backups
 data/source_texts/*_full.md
+
+# Generated podcast outputs
+outputs/generated/*
+!outputs/generated/.gitkeep
