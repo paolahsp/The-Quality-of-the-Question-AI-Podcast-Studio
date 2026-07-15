@@ -25,6 +25,11 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
+from src.podcast_pipeline import (
+    format_podcast_script,
+    generate_podcast_script,
+)
+
 
 # ---------------------------------------------------------
 # Project paths
@@ -221,61 +226,45 @@ def update_source_metadata(source_text: str) -> str:
 # Script callbacks
 # ---------------------------------------------------------
 
-def load_approved_demo_script(
+def generate_script_from_source(
     source_text: str,
 ) -> tuple[str, str, str, bool, str, str]:
     """
-    Load the approved demo podcast script.
-
-    This function does not make an OpenAI request.
+    Generate a podcast script from the authorized source text.
     """
     if not source_text or not source_text.strip():
         return (
             "",
-            (
-                "❌ Load or paste authorized source text "
-                "before continuing."
-            ),
+            "❌ Paste or load authorized source text before continuing.",
             build_script_metadata(""),
             False,
             "v1.0",
-            create_approval_message(
-                False,
-                "v1.0",
-            ),
+            create_approval_message(False, "v1.0"),
         )
 
-    script_text = read_text_file(SCRIPT_FILE)
-
-    if not script_text:
+    try:
+        podcast_script = generate_podcast_script(source_text)
+        script_text = format_podcast_script(podcast_script)
+    except Exception as error:
         return (
             "",
-            (
-                "⚠️ The approved podcast script was not "
-                "found or is empty."
-            ),
+            f"❌ Script generation failed: {error}",
             build_script_metadata(""),
             False,
             "v1.0",
-            create_approval_message(
-                False,
-                "v1.0",
-            ),
+            create_approval_message(False, "v1.0"),
         )
 
     return (
         script_text,
         (
-            "✅ Demo Mode: the approved podcast script "
-            "was loaded. No new API request was made."
+            "✅ Podcast script generated from the authorized "
+            "source. Review and edit it before approval."
         ),
         build_script_metadata(script_text),
         False,
         "v1.0",
-        create_approval_message(
-            False,
-            "v1.0",
-        ),
+        create_approval_message(False, "v1.0"),
     )
 
 
@@ -292,25 +281,11 @@ def reset_script() -> tuple[
     str,
     bool,
 ]:
-    """
-    Reload the approved demo script and reset review state.
-    """
-    script_text = read_text_file(SCRIPT_FILE)
-
-    if not script_text:
-        return (
-            "",
-            "⚠️ Approved demo script not found.",
-            build_script_metadata(""),
-            False,
-            "v1.0",
-            False,
-        )
-
+    """Clear the generated script and reset the review state."""
     return (
-        script_text,
-        "✅ Script reset to the approved demo version.",
-        build_script_metadata(script_text),
+        "",
+        "Script cleared. Generate a new script from the authorized source.",
+        build_script_metadata(""),
         False,
         "v1.0",
         False,
@@ -619,7 +594,7 @@ with gr.Blocks(
         Transform authorized book content into a reviewed
         podcast script and narrated audio.
 
-        **Current mode:** Demo Mode
+        **Current mode:** OpenAI Pipeline
         """
     )
 
@@ -693,7 +668,7 @@ with gr.Blocks(
 
             with gr.Row():
                 load_script_button = gr.Button(
-                    "Generate / Load Demo Script",
+                    "Generate Podcast Script",
                     variant="primary",
                 )
 
@@ -969,7 +944,7 @@ with gr.Blocks(
     )
 
     load_script_button.click(
-        fn=load_approved_demo_script,
+        fn=generate_script_from_source,
         inputs=[source_text],
         outputs=[
             script_text,

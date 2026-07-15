@@ -88,6 +88,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     approved: false,
     approvedVersion: null,
     initialScript: "",
+    audioUrl: null,
     review: Object.create(null)
   };
 
@@ -103,10 +104,9 @@ Better answers are useful. Better questions change what becomes possible.`;
       "reviewerNotes", "summaryCompleted", "summaryPassed", "summaryRevision",
       "compareButton", "requestChangesButton", "finalConfirmation", "approveButton",
       "approvalMeta", "audioLockMessage", "audioStatus", "audioWorkspace",
-      "voiceSelector", "loadDemoAudioButton", "audioPlayer", "audioMessage", "downloadAudioLink",
+      "voiceSelector", "generateAudioButton", "audioPlayer", "audioMessage", "downloadAudioLink",
       "downloadTranscriptButton", "reflectionInput", "clearReflectionButton",
-      "comparisonDialog", "comparisonSource", "comparisonScript", "toast",
-      "openGradioButton"
+      "comparisonDialog", "comparisonSource", "comparisonScript", "toast"
     ].forEach((id) => {
       elements[id] = byId(id);
     });
@@ -281,6 +281,11 @@ Better answers are useful. Better questions change what becomes possible.`;
     elements.approvalMeta.hidden = true;
     elements.audioPlayer.pause();
     elements.audioPlayer.hidden = true;
+    elements.audioPlayer.removeAttribute("src");
+    if (state.audioUrl) {
+      URL.revokeObjectURL(state.audioUrl);
+      state.audioUrl = null;
+    }
     elements.downloadAudioLink.classList.add("is-disabled-link");
     elements.downloadAudioLink.removeAttribute("href");
     elements.audioMessage.textContent = "No audio has been loaded yet.";
@@ -308,7 +313,7 @@ Better answers are useful. Better questions change what becomes possible.`;
 
   async function loadSource() {
     elements.loadSourceButton.disabled = true;
-    const text = await getDemoText("/api/demo/source", SAMPLE_SOURCE);
+    const text = await getDemoText("/api/source", SAMPLE_SOURCE);
     elements.sourceInput.value = text;
     elements.loadSourceButton.disabled = false;
     updateSourceStats();
@@ -321,6 +326,15 @@ Better answers are useful. Better questions change what becomes possible.`;
     showToast("Source cleared.");
   }
 
+  async function readErrorMessage(response) {
+    try {
+      const payload = await response.json();
+      return payload.detail || payload.error || `Request failed with HTTP ${response.status}.`;
+    } catch (_error) {
+      return `Request failed with HTTP ${response.status}.`;
+    }
+  }
+
   async function generateScript() {
     if (!elements.sourceInput.value.trim()) {
       showToast("Add or load an authorized source first.");
@@ -329,23 +343,49 @@ Better answers are useful. Better questions change what becomes possible.`;
     }
 
     elements.generateScriptButton.disabled = true;
-    elements.generateScriptButton.textContent = "Loading Demo Script…";
-    const approvedScript = await getDemoText("/api/demo/script", SAMPLE_SCRIPT);
-    const title = elements.episodeTitle.value.trim() || "Why Better Questions Build Better Businesses";
-    const script = approvedScript.replace(/^#\s+.*$/m, `# ${title}`);
+    elements.generateScriptButton.textContent = "Generating Script…";
+    elements.scriptModeMessage.textContent = "OpenAI is transforming the authorized source…";
 
-    state.version += 1;
-    state.initialScript = script;
-    elements.scriptOutput.value = script;
-    elements.scriptModeMessage.textContent = `Approved demo script loaded · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value}`;
-    elements.generateScriptButton.disabled = false;
-    elements.generateScriptButton.textContent = "Generate Podcast Script";
-    lockAudio();
-    clearReviewSelections();
-    unlockReview();
-    updateScriptStats();
-    elements.reviewContent.scrollIntoView({ behavior: "smooth", block: "start" });
-    showToast("Demo script ready for human review.");
+    try {
+      const response = await fetch("/api/generate-script", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ source_text: elements.sourceInput.value })
+      });
+
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+      }
+
+      const payload = await response.json();
+      const generatedScript = String(payload.script || "").trim();
+      if (!generatedScript) throw new Error("The server returned an empty script.");
+
+      const requestedTitle = elements.episodeTitle.value.trim();
+      const script = requestedTitle
+        ? generatedScript.replace(/^#\s+.*$/m, `# ${requestedTitle}`)
+        : generatedScript;
+
+      state.version += 1;
+      state.initialScript = script;
+      elements.scriptOutput.value = script;
+      elements.scriptModeMessage.textContent = `Generated from authorized source · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value}`;
+      lockAudio();
+      clearReviewSelections();
+      unlockReview();
+      updateScriptStats();
+      elements.reviewContent.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast("Podcast script ready for human review.");
+    } catch (error) {
+      elements.scriptModeMessage.textContent = `Script generation failed: ${error.message}`;
+      showToast("The script could not be generated.");
+    } finally {
+      elements.generateScriptButton.disabled = false;
+      elements.generateScriptButton.textContent = "Generate Podcast Script";
+    }
   }
 
   function resetScript() {
@@ -356,7 +396,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     unlockReview();
     updateScriptStats();
     elements.scriptModeMessage.textContent = state.initialScript
-      ? "Script restored to the last loaded demo version."
+      ? "Script restored to the last generated version."
       : "Generate a script to begin editorial review.";
     showToast("Script reset.");
   }
@@ -430,23 +470,57 @@ Better answers are useful. Better questions change what becomes possible.`;
     showToast("Script approved. Audio workspace unlocked.");
   }
 
-  function loadDemoAudio() {
+  async function generateAudio() {
     if (!state.approved) {
-      showToast("Approve the current script before loading audio.");
+      showToast("Approve the current script before generating audio.");
+      return;
+    }
+    if (state.approvedVersion !== state.version) {
+      lockAudio();
+      showToast("The script changed and must be approved again.");
       return;
     }
 
-    elements.audioMessage.textContent = "Loading demo audio…";
-    elements.audioPlayer.hidden = false;
-    elements.audioPlayer.src = `/demo-audio?v=${Date.now()}`;
-    elements.audioPlayer.load();
-  }
+    elements.generateAudioButton.disabled = true;
+    elements.generateAudioButton.textContent = "Generating Audio…";
+    elements.audioMessage.textContent = "OpenAI TTS is generating the approved narration…";
+    setStatus(elements.audioStatus, "Generating", "ready");
 
-  function configureLiveStudioLink() {
-    const servedByPython = window.location.port === "7860";
-    elements.openGradioButton.href = servedByPython
-      ? `${window.location.origin}/studio/`
-      : "http://127.0.0.1:7860/studio/";
+    try {
+      const response = await fetch("/api/generate-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          script_text: elements.scriptOutput.value,
+          voice: elements.voiceSelector.value,
+          approved: true
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response));
+      }
+
+      const audioBlob = await response.blob();
+      if (state.audioUrl) URL.revokeObjectURL(state.audioUrl);
+      state.audioUrl = URL.createObjectURL(audioBlob);
+      elements.audioPlayer.src = state.audioUrl;
+      elements.audioPlayer.hidden = false;
+      elements.audioPlayer.load();
+      elements.downloadAudioLink.href = state.audioUrl;
+      elements.downloadAudioLink.download = "quality_of_the_question_podcast.mp3";
+      elements.downloadAudioLink.classList.remove("is-disabled-link");
+      elements.audioMessage.textContent = `Generated audio ready · ${elements.voiceSelector.options[elements.voiceSelector.selectedIndex].text}`;
+      setStatus(elements.audioStatus, "Audio Ready", "approved");
+      showToast("Approved audio generated successfully.");
+    } catch (error) {
+      elements.audioMessage.textContent = `Audio generation failed: ${error.message}`;
+      setStatus(elements.audioStatus, "Generation Failed", "danger");
+      showToast("The audio could not be generated.");
+    } finally {
+      elements.generateAudioButton.disabled = false;
+      elements.generateAudioButton.textContent = "Generate Approved Audio";
+    }
   }
 
   function bindEvents() {
@@ -469,7 +543,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     elements.requestChangesButton.addEventListener("click", requestChanges);
     elements.finalConfirmation.addEventListener("change", updateReviewSummary);
     elements.approveButton.addEventListener("click", approveScript);
-    elements.loadDemoAudioButton.addEventListener("click", loadDemoAudio);
+    elements.generateAudioButton.addEventListener("click", generateAudio);
     elements.downloadTranscriptButton.addEventListener("click", () => {
       downloadText("podcast_transcript.txt", elements.scriptOutput.value, "text/plain;charset=utf-8");
     });
@@ -482,17 +556,13 @@ Better answers are useful. Better questions change what becomes possible.`;
       sessionStorage.setItem("podcast-studio-reflection", elements.reflectionInput.value);
     });
     elements.audioPlayer.addEventListener("canplay", () => {
-      elements.audioMessage.textContent = `Demo audio ready · ${elements.voiceSelector?.value || "Selected narrator"}`;
-      elements.downloadAudioLink.href = "/demo-audio";
-      elements.downloadAudioLink.download = "book_intro_podcast.mp3";
-      elements.downloadAudioLink.classList.remove("is-disabled-link");
       setStatus(elements.audioStatus, "Audio Ready", "approved");
     });
     elements.audioPlayer.addEventListener("error", () => {
       elements.audioPlayer.hidden = true;
-      elements.audioMessage.textContent = "Demo audio was not found. Add outputs/demo/book_intro_podcast.mp3 and try again.";
-      setStatus(elements.audioStatus, "Audio Missing", "danger");
-      showToast("Demo audio file not found.");
+      elements.audioMessage.textContent = "The generated audio could not be loaded by the browser.";
+      setStatus(elements.audioStatus, "Audio Error", "danger");
+      showToast("Generated audio could not be loaded.");
     });
   }
 
@@ -500,7 +570,6 @@ Better answers are useful. Better questions change what becomes possible.`;
     cacheElements();
     renderCriteria();
     bindEvents();
-    configureLiveStudioLink();
     elements.reflectionInput.value = sessionStorage.getItem("podcast-studio-reflection") || "";
     updateSourceStats();
     updateScriptStats();

@@ -29,7 +29,7 @@
   <main>
     <section class="intro" id="studio">
       <div>
-        <p class="eyebrow">Interactive laboratory · Demo mode</p>
+        <p class="eyebrow">Interactive laboratory · Live OpenAI pipeline</p>
         <h1>Turn authorized book content into a reviewed podcast script and narrated audio.</h1>
         <p class="intro__copy">
           Work from source to script, complete the human review, then unlock narration.
@@ -62,7 +62,7 @@
         <textarea id="sourceInput" aria-label="Authorized source input" placeholder="Paste an authorized excerpt here..."></textarea>
 
         <div class="actions">
-          <button class="button button--secondary" id="loadSourceButton" type="button">Load Book Sample</button>
+          <button class="button button--secondary" id="loadSourceButton" type="button">Load Authorized Book Source</button>
           <button class="button button--secondary" id="clearSourceButton" type="button">Clear</button>
           <button class="button button--primary" id="generateScriptButton" type="button">Generate Podcast Script</button>
         </div>
@@ -109,7 +109,7 @@
 
         <p class="helper" id="scriptModeMessage">Generate a script to begin editorial review.</p>
 
-        <textarea id="scriptOutput" aria-label="Editable podcast script" placeholder="The generated or approved demo script will appear here..."></textarea>
+        <textarea id="scriptOutput" aria-label="Editable podcast script" placeholder="The generated podcast script will appear here..."></textarea>
 
         <div class="actions">
           <button class="button button--secondary" id="copyScriptButton" type="button">Copy</button>
@@ -179,17 +179,14 @@
         <label>
           Narrator voice
           <select id="voiceSelector">
-            <option>Narrator A — Reflective</option>
-            <option>Narrator B — Clear</option>
-            <option>Narrator C — Warm</option>
+            <option value="nova" selected>Nova — Reflective</option>
+            <option value="alloy">Alloy — Clear</option>
+            <option value="shimmer">Shimmer — Warm</option>
           </select>
         </label>
 
         <div class="actions">
-          <button class="button button--secondary" id="loadDemoAudioButton" type="button">Load Demo Audio</button>
-          <a class="button button--primary" id="openGradioButton" href="/studio/" target="_blank" rel="noreferrer">
-            Open Live Gradio Studio
-          </a>
+          <button class="button button--primary" id="generateAudioButton" type="button">Generate Approved Audio</button>
         </div>
 
         <audio id="audioPlayer" controls preload="metadata" hidden></audio>
@@ -208,9 +205,9 @@
         <h2>Source → Script → Review → Audio</h2>
         <ol class="workflow-list">
           <li><strong>Authorized Source</strong><span>Select or paste approved editorial content.</span></li>
-          <li><strong>Script Transformation</strong><span>Demo mode loads the approved script; live generation belongs in Gradio.</span></li>
+          <li><strong>Script Transformation</strong><span>OpenAI transforms the authorized textbox content into an editable podcast script.</span></li>
           <li><strong>Human Review</strong><span>Check accuracy, attribution, tone, pacing, and privacy.</span></li>
-          <li><strong>Narration</strong><span>Only an approved script can move to audio.</span></li>
+          <li><strong>Narration</strong><span>OpenAI TTS generates audio from the current approved script without leaving this page.</span></li>
         </ol>
       </article>
 
