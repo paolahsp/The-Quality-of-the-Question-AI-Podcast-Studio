@@ -89,8 +89,11 @@ Better answers are useful. Better questions change what becomes possible.`;
     approvedVersion: null,
     initialScript: "",
     audioUrl: null,
+    openaiConfigured: true,
     review: Object.create(null)
   };
+  const REVIEW_STORAGE_KEY = "podcast-studio-review-state";
+  const REFLECTION_STORAGE_KEY = "podcast-studio-reflection-parking-lot";
 
   const byId = (id) => document.getElementById(id);
 
@@ -102,10 +105,13 @@ Better answers are useful. Better questions change what becomes possible.`;
       "copyScriptButton", "resetScriptButton", "downloadScriptButton",
       "reviewStatus", "reviewLocked", "reviewContent", "criteriaList",
       "reviewerNotes", "summaryCompleted", "summaryPassed", "summaryRevision",
+      "revisionFocusList", "revisionSavedState", "reviewWorkflowHint",
       "compareButton", "requestChangesButton", "finalConfirmation", "approveButton",
-      "approvalMeta", "audioLockMessage", "audioStatus", "audioWorkspace",
+      "approvalMeta", "audioLockMessage", "audioStatus", "audioWorkspace", "audioWorkflowHint",
       "voiceSelector", "generateAudioButton", "audioPlayer", "audioMessage", "downloadAudioLink",
-      "downloadTranscriptButton", "reflectionInput", "clearReflectionButton",
+      "downloadTranscriptButton", "reflectionInput", "saveReflectionButton",
+      "clearReflectionButton", "reflectionParkingList",
+      "reflectionParkingEmpty", "clearParkingButton", "parkingCount",
       "comparisonDialog", "comparisonSource", "comparisonScript", "toast"
     ].forEach((id) => {
       elements[id] = byId(id);
@@ -166,12 +172,26 @@ Better answers are useful. Better questions change what becomes possible.`;
     });
   }
 
+  function updateCriterionAppearance(article, criterionId) {
+    article.classList.remove("is-pass", "is-revision", "is-na");
+    const value = state.review[criterionId];
+    if (value === "pass") {
+      article.classList.add("is-pass");
+    } else if (value === "revision") {
+      article.classList.add("is-revision");
+    } else if (value === "na") {
+      article.classList.add("is-na");
+    }
+  }
+
   function renderCriteria() {
     elements.criteriaList.replaceChildren();
 
     REVIEW_CRITERIA.forEach((criterion) => {
       const article = document.createElement("article");
       article.className = "criterion";
+      updateCriterionAppearance(article, criterion.id);
+      article.dataset.criterionId = criterion.id;
 
       const top = document.createElement("div");
       top.className = "criterion__top";
@@ -200,8 +220,10 @@ Better answers are useful. Better questions change what becomes possible.`;
         input.value = value;
         input.addEventListener("change", () => {
           state.review[criterion.id] = value;
+          updateCriterionAppearance(article, criterion.id);
           invalidateApproval("Review updated. Approval must match the current review.");
           updateReviewSummary();
+          persistReviewState();
         });
 
         const label = document.createElement("label");
@@ -237,6 +259,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     elements.finalConfirmation.checked = false;
     elements.reviewerNotes.value = "";
     updateReviewSummary();
+    persistReviewState();
   }
 
   function reviewCounts() {
@@ -248,27 +271,153 @@ Better answers are useful. Better questions change what becomes possible.`;
     };
   }
 
+  function persistReviewState() {
+    try {
+      const snapshot = {
+        review: state.review,
+        notes: elements.reviewerNotes.value,
+        finalConfirmation: elements.finalConfirmation.checked
+      };
+      window.localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(snapshot));
+      elements.revisionSavedState.textContent = "Saved locally";
+    } catch (_error) {
+      elements.revisionSavedState.textContent = "Local save unavailable";
+    }
+  }
+
+  function restoreReviewState() {
+    try {
+      const raw = window.localStorage.getItem(REVIEW_STORAGE_KEY);
+      if (!raw) return;
+      const snapshot = JSON.parse(raw);
+      if (snapshot.review) {
+        state.review = snapshot.review;
+      }
+      if (snapshot.notes !== undefined) {
+        elements.reviewerNotes.value = snapshot.notes;
+      }
+      if (snapshot.finalConfirmation !== undefined) {
+        elements.finalConfirmation.checked = Boolean(snapshot.finalConfirmation);
+      }
+      document.querySelectorAll('#criteriaList input[type="radio"]').forEach((input) => {
+        const criterionId = input.name;
+        const value = state.review[criterionId];
+        input.checked = input.value === value;
+      });
+      document.querySelectorAll('#criteriaList article').forEach((article) => {
+        updateCriterionAppearance(article, article.dataset.criterionId);
+      });
+    } catch (_error) {
+      elements.revisionSavedState.textContent = "Review state could not be restored";
+    }
+  }
+
+  function updateWorkflowHints() {
+    const hasScript = Boolean(elements.scriptOutput.value.trim());
+    const counts = reviewCounts();
+    const isComplete = counts.completed === REVIEW_CRITERIA.length;
+
+    if (!hasScript) {
+      elements.reviewWorkflowHint.textContent = "Start with an authorized source and generate a script to begin review.";
+      elements.reviewWorkflowHint.classList.remove("is-strong");
+      elements.audioWorkflowHint.textContent = "The audio workspace stays locked until the script is approved.";
+      elements.audioWorkflowHint.classList.remove("is-strong");
+      return;
+    }
+
+    if (!isComplete) {
+      elements.reviewWorkflowHint.textContent = `${REVIEW_CRITERIA.length - counts.completed} review criteria still need a decision before approval is possible.`;
+      elements.reviewWorkflowHint.classList.add("is-strong");
+      elements.audioWorkflowHint.textContent = "Complete the review checklist to unlock narration.";
+      elements.audioWorkflowHint.classList.remove("is-strong");
+      return;
+    }
+
+    if (counts.revision > 0) {
+      elements.reviewWorkflowHint.textContent = "Revision points are flagged. Update the draft and request another review when ready.";
+      elements.reviewWorkflowHint.classList.add("is-strong");
+      elements.audioWorkflowHint.textContent = "The audio workspace remains locked until the revised script is approved.";
+      elements.audioWorkflowHint.classList.remove("is-strong");
+      return;
+    }
+
+    if (state.approved) {
+      elements.reviewWorkflowHint.textContent = "The script is approved. Audio is ready to generate from this version.";
+      elements.reviewWorkflowHint.classList.add("is-strong");
+      elements.audioWorkflowHint.textContent = "This approved script is ready for narration.";
+      elements.audioWorkflowHint.classList.add("is-strong");
+      return;
+    }
+
+    elements.reviewWorkflowHint.textContent = "The checklist is complete. Confirm the final version and approve it for narration.";
+    elements.reviewWorkflowHint.classList.add("is-strong");
+    elements.audioWorkflowHint.textContent = "The audio workspace unlocks after approval.";
+    elements.audioWorkflowHint.classList.remove("is-strong");
+  }
+
   function updateReviewSummary() {
     const counts = reviewCounts();
     elements.summaryCompleted.textContent = `${counts.completed}/${REVIEW_CRITERIA.length}`;
     elements.summaryPassed.textContent = String(counts.passed);
     elements.summaryRevision.textContent = String(counts.revision);
 
+    const hasScript = Boolean(elements.scriptOutput.value.trim());
+    const isComplete = counts.completed === REVIEW_CRITERIA.length;
     const canApprove =
-      Boolean(elements.scriptOutput.value.trim()) &&
-      counts.completed === REVIEW_CRITERIA.length &&
+      hasScript &&
+      isComplete &&
       counts.revision === 0 &&
       elements.finalConfirmation.checked;
 
     elements.approveButton.disabled = !canApprove;
 
-    if (!state.approved && counts.completed === REVIEW_CRITERIA.length) {
-      setStatus(
-        elements.reviewStatus,
-        counts.revision ? "Revision Needed" : "Ready to Approve",
-        counts.revision ? "danger" : "ready"
-      );
+    if (!hasScript) {
+      setStatus(elements.reviewStatus, "Not Started", "neutral");
+    } else if (!isComplete) {
+      setStatus(elements.reviewStatus, "In Review", "ready");
+    } else if (counts.revision > 0) {
+      setStatus(elements.reviewStatus, "Revision Needed", "danger");
+    } else {
+      setStatus(elements.reviewStatus, "Ready to Approve", "ready");
     }
+
+    if (!hasScript) {
+      elements.reviewLocked.hidden = false;
+      elements.reviewContent.classList.add("is-disabled");
+      elements.reviewContent.setAttribute("aria-disabled", "true");
+    } else {
+      elements.reviewLocked.hidden = true;
+      elements.reviewContent.classList.remove("is-disabled");
+      elements.reviewContent.setAttribute("aria-disabled", "false");
+    }
+
+    const revisionItems = REVIEW_CRITERIA.filter((criterion) => state.review[criterion.id] === "revision");
+    const noteText = elements.reviewerNotes.value.trim();
+    const focusItems = [];
+
+    if (revisionItems.length > 0) {
+      revisionItems.forEach((criterion) => {
+        focusItems.push(`<li><strong>${criterion.title}</strong><span>Revision requested</span></li>`);
+      });
+    } else if (counts.completed === REVIEW_CRITERIA.length) {
+      focusItems.push(`<li><strong>Everything looks aligned.</strong><span>Ready for approval if the final confirmation is checked.</span></li>`);
+    } else {
+      focusItems.push(`<li><strong>${REVIEW_CRITERIA.length - counts.completed} review criteria still need a decision.</strong><span>Complete the checklist to unlock approval.</span></li>`);
+    }
+
+    if (noteText) {
+      focusItems.push(`<li><strong>Reviewer notes captured.</strong><span>${noteText}</span></li>`);
+    }
+
+    elements.revisionFocusList.innerHTML = focusItems.length ? focusItems.join("") : "<li>No review issues flagged yet.</li>";
+
+    if (isComplete && counts.revision > 0 && noteText) {
+      elements.requestChangesButton.textContent = "Changes Requested";
+    } else {
+      elements.requestChangesButton.textContent = "Request Changes";
+    }
+
+    updateWorkflowHints();
   }
 
   function lockAudio() {
@@ -276,6 +425,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     state.approvedVersion = null;
     elements.audioWorkspace.classList.add("is-disabled");
     elements.audioWorkspace.setAttribute("aria-disabled", "true");
+    elements.generateAudioButton.disabled = true;
     elements.audioLockMessage.textContent = "Complete the human review and approve the final script before narration.";
     setStatus(elements.audioStatus, "Locked", "neutral");
     elements.approvalMeta.hidden = true;
@@ -290,6 +440,7 @@ Better answers are useful. Better questions change what becomes possible.`;
     elements.downloadAudioLink.removeAttribute("href");
     elements.audioMessage.textContent = "No audio has been loaded yet.";
     updatePipeline();
+    updateWorkflowHints();
   }
 
   function invalidateApproval(message) {
@@ -335,6 +486,67 @@ Better answers are useful. Better questions change what becomes possible.`;
     }
   }
 
+  async function checkRuntimeStatus() {
+    try {
+      const response = await fetch("/health", {
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const payload = await response.json();
+
+      state.openaiConfigured = Boolean(
+        payload.openai_configured
+      );
+
+      /*
+       * Script generation stays available because the
+       * backend supports a local fallback draft.
+       */
+      elements.generateScriptButton.disabled = false;
+
+      if (state.openaiConfigured) {
+        elements.scriptModeMessage.textContent =
+          "OpenAI is ready to generate a podcast script.";
+
+        elements.audioMessage.textContent =
+          "Approve the script to enable audio generation.";
+
+        elements.generateAudioButton.disabled =
+          !state.approved;
+      } else {
+        elements.scriptModeMessage.textContent =
+          "OpenAI is not configured. Script generation will use the local fallback draft.";
+
+        elements.audioMessage.textContent =
+          "Audio generation requires an OpenAI API key.";
+
+        elements.generateAudioButton.disabled = true;
+      }
+    } catch (error) {
+      state.openaiConfigured = false;
+
+      elements.generateScriptButton.disabled = false;
+      elements.generateAudioButton.disabled = true;
+
+      elements.scriptModeMessage.textContent =
+        "Runtime status could not be verified. Script generation will attempt the local fallback.";
+
+      elements.audioMessage.textContent =
+        "Audio generation is unavailable until the server and API key are configured.";
+
+      console.error(
+        "Runtime status check failed:",
+        error
+      );
+    }
+  }
+
   async function generateScript() {
     if (!elements.sourceInput.value.trim()) {
       showToast("Add or load an authorized source first.");
@@ -344,7 +556,10 @@ Better answers are useful. Better questions change what becomes possible.`;
 
     elements.generateScriptButton.disabled = true;
     elements.generateScriptButton.textContent = "Generating Script…";
-    elements.scriptModeMessage.textContent = "OpenAI is transforming the authorized source…";
+    elements.scriptModeMessage.textContent =
+      state.openaiConfigured
+        ? "OpenAI is transforming the authorized source…"
+        : "Preparing a local fallback draft…";
 
     try {
       const response = await fetch("/api/generate-script", {
@@ -365,6 +580,7 @@ Better answers are useful. Better questions change what becomes possible.`;
       if (!generatedScript) throw new Error("The server returned an empty script.");
 
       const requestedTitle = elements.episodeTitle.value.trim();
+      const modeLabel = payload.mode === "fallback" ? "local fallback draft" : "OpenAI-generated script";
       const script = requestedTitle
         ? generatedScript.replace(/^#\s+.*$/m, `# ${requestedTitle}`)
         : generatedScript;
@@ -372,12 +588,13 @@ Better answers are useful. Better questions change what becomes possible.`;
       state.version += 1;
       state.initialScript = script;
       elements.scriptOutput.value = script;
-      elements.scriptModeMessage.textContent = `Generated from authorized source · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value} · Move on to Step 3 below to customize your podcast script`;
+      elements.scriptModeMessage.textContent = `${modeLabel} · ${elements.audience.value} · ${elements.tone.value} · ${elements.duration.value}`;
       lockAudio();
       clearReviewSelections();
       unlockReview();
       updateScriptStats();
-      showToast("Podcast script ready for human review.");
+      elements.reviewContent.scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast(payload.mode === "fallback" ? "A local fallback draft is ready for review." : "Podcast script ready for human review.");
     } catch (error) {
       elements.scriptModeMessage.textContent = `Script generation failed: ${error.message}`;
       showToast("The script could not be generated.");
@@ -444,6 +661,18 @@ Better answers are useful. Better questions change what becomes possible.`;
   }
 
   function requestChanges() {
+    const notes = elements.reviewerNotes.value.trim();
+    if (!elements.scriptOutput.value.trim()) {
+      showToast("Generate or load a script before requesting changes.");
+      return;
+    }
+
+    if (!notes) {
+      elements.reviewerNotes.focus();
+      showToast("Add reviewer notes so the revision request is clear.");
+      return;
+    }
+
     lockAudio();
     elements.finalConfirmation.checked = false;
     setStatus(elements.reviewStatus, "Changes Requested", "danger");
@@ -460,16 +689,23 @@ Better answers are useful. Better questions change what becomes possible.`;
     const approvedAt = new Date();
     elements.audioWorkspace.classList.remove("is-disabled");
     elements.audioWorkspace.setAttribute("aria-disabled", "false");
+    elements.generateAudioButton.disabled = false;
     elements.audioLockMessage.textContent = `Script v${state.version}.0 is approved and ready for narration.`;
     setStatus(elements.audioStatus, "Unlocked", "approved");
     setStatus(elements.reviewStatus, "Approved", "approved");
     elements.approvalMeta.hidden = false;
     elements.approvalMeta.textContent = `Approved: v${state.version}.0 · ${approvedAt.toLocaleString()}`;
     updatePipeline();
+    updateWorkflowHints();
     showToast("Script approved. Audio workspace unlocked.");
   }
 
   async function generateAudio() {
+    if (!state.openaiConfigured) {
+      showToast("OpenAI is not configured. Add an API key to enable audio generation.");
+      return;
+    }
+
     if (!state.approved) {
       showToast("Approve the current script before generating audio.");
       return;
@@ -522,6 +758,144 @@ Better answers are useful. Better questions change what becomes possible.`;
     }
   }
 
+  function loadParkedReflections() {
+    try {
+      const raw = window.localStorage.getItem(
+        REFLECTION_STORAGE_KEY
+      );
+
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+
+      return Array.isArray(parsed)
+        ? parsed
+        : [];
+    } catch (_error) {
+      return [];
+    }
+  }
+
+  function saveParkedReflections(reflections) {
+    try {
+      window.localStorage.setItem(
+        REFLECTION_STORAGE_KEY,
+        JSON.stringify(reflections)
+      );
+    } catch (_error) {
+      showToast(
+        "This browser could not save the reflection."
+      );
+    }
+  }
+
+  function renderReflectionParking() {
+    const reflections = loadParkedReflections();
+
+    elements.reflectionParkingList.replaceChildren();
+
+    elements.reflectionParkingEmpty.hidden =
+      reflections.length > 0;
+
+    elements.parkingCount.textContent =
+      `${reflections.length} saved`;
+
+    reflections.forEach((reflection, index) => {
+      const item = document.createElement("li");
+      item.className = "parking-item";
+
+      const content = document.createElement("div");
+      content.className = "parking-item__content";
+
+      const text = document.createElement("p");
+      text.textContent = reflection.text;
+
+      const timestamp = document.createElement("time");
+      timestamp.dateTime = reflection.createdAt;
+      timestamp.textContent = new Date(
+        reflection.createdAt
+      ).toLocaleString();
+
+      content.append(text, timestamp);
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "parking-item__remove";
+      removeButton.textContent = "Remove";
+      removeButton.setAttribute(
+        "aria-label",
+        `Remove reflection ${index + 1}`
+      );
+
+      removeButton.addEventListener("click", () => {
+        const current = loadParkedReflections();
+        current.splice(index, 1);
+        saveParkedReflections(current);
+        renderReflectionParking();
+        showToast("Reflection removed.");
+      });
+
+      item.append(content, removeButton);
+      elements.reflectionParkingList.append(item);
+    });
+  }
+
+  function parkReflection() {
+    const reflectionText =
+      elements.reflectionInput.value.trim();
+
+    if (!reflectionText) {
+      elements.reflectionInput.focus();
+      showToast(
+        "Write a reflection before adding it to the parking lot."
+      );
+      return;
+    }
+
+    const reflections = loadParkedReflections();
+
+    reflections.unshift({
+      text: reflectionText,
+      createdAt: new Date().toISOString()
+    });
+
+    saveParkedReflections(reflections);
+
+    elements.reflectionInput.value = "";
+    window.sessionStorage.removeItem(
+      "podcast-studio-reflection"
+    );
+
+    renderReflectionParking();
+    showToast("Reflection added to the parking lot.");
+  }
+
+  function clearReflectionParking() {
+    const reflections = loadParkedReflections();
+
+    if (reflections.length === 0) {
+      showToast("The reflection parking lot is already empty.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Clear every saved reflection from the parking lot?"
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    window.localStorage.removeItem(
+      REFLECTION_STORAGE_KEY
+    );
+
+    renderReflectionParking();
+    showToast("Reflection parking lot cleared.");
+  }
+
   function bindEvents() {
     elements.sourceInput.addEventListener("input", updateSourceStats);
     elements.scriptOutput.addEventListener("input", () => {
@@ -529,6 +903,10 @@ Better answers are useful. Better questions change what becomes possible.`;
       unlockReview();
       updateScriptStats();
       updateReviewSummary();
+    });
+    elements.reviewerNotes.addEventListener("input", () => {
+      updateReviewSummary();
+      persistReviewState();
     });
     elements.loadSourceButton.addEventListener("click", loadSource);
     elements.clearSourceButton.addEventListener("click", clearSource);
@@ -540,17 +918,30 @@ Better answers are useful. Better questions change what becomes possible.`;
     });
     elements.compareButton.addEventListener("click", openComparison);
     elements.requestChangesButton.addEventListener("click", requestChanges);
-    elements.finalConfirmation.addEventListener("change", updateReviewSummary);
+    elements.finalConfirmation.addEventListener("change", () => {
+      updateReviewSummary();
+      persistReviewState();
+    });
     elements.approveButton.addEventListener("click", approveScript);
     elements.generateAudioButton.addEventListener("click", generateAudio);
     elements.downloadTranscriptButton.addEventListener("click", () => {
       downloadText("podcast_transcript.txt", elements.scriptOutput.value, "text/plain;charset=utf-8");
     });
+    elements.saveReflectionButton.addEventListener(
+      "click",
+      parkReflection
+    );
+
     elements.clearReflectionButton.addEventListener("click", () => {
       elements.reflectionInput.value = "";
       sessionStorage.removeItem("podcast-studio-reflection");
-      showToast("Reflection cleared.");
+      showToast("Reflection draft cleared.");
     });
+
+    elements.clearParkingButton.addEventListener(
+      "click",
+      clearReflectionParking
+    );
     elements.reflectionInput.addEventListener("input", () => {
       sessionStorage.setItem("podcast-studio-reflection", elements.reflectionInput.value);
     });
@@ -565,17 +956,30 @@ Better answers are useful. Better questions change what becomes possible.`;
     });
   }
 
-  function initialize() {
+  async function initialize() {
     cacheElements();
     renderCriteria();
     bindEvents();
-    elements.reflectionInput.value = sessionStorage.getItem("podcast-studio-reflection") || "";
+    restoreReviewState();
+    elements.reflectionInput.value =
+      sessionStorage.getItem(
+        "podcast-studio-reflection"
+      ) || "";
+
+    renderReflectionParking();
     updateSourceStats();
     updateScriptStats();
     unlockReview();
     updateReviewSummary();
     lockAudio();
+    updateWorkflowHints();
+    await checkRuntimeStatus();
   }
 
-  document.addEventListener("DOMContentLoaded", initialize);
+  document.addEventListener("DOMContentLoaded", () => {
+    initialize().catch(() => {
+      elements.generateScriptButton.disabled = true;
+      elements.generateAudioButton.disabled = true;
+    });
+  });
 })();

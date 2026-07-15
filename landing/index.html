@@ -14,7 +14,8 @@
   <header class="topbar">
     <div class="topbar__inner">
       <div>
-        <strong>AI Podcast Studio Lab</strong>
+        <strong>The Quality of the Question</strong>
+        <span class="topbar__subtitle">AI Podcast Studio Lab</span>
       </div>
       <nav class="topbar__nav" aria-label="Primary navigation">
         <a href="#studio">Studio</a>
@@ -51,7 +52,7 @@
         <div class="panel__header">
           <div>
             <p class="eyebrow">Input</p>
-            <h2>1. Source</h2>
+            <h2>1. Authorized Source</h2>
           </div>
           <span id="sourceStats" class="meta">0 words · 0 characters</span>
         </div>
@@ -106,7 +107,7 @@
           </div>
         </div>
 
-        <p class="helper" id="scriptModeMessage">Generate a script to begin editorial review and write in this box.</p>
+        <p class="helper" id="scriptModeMessage">Generate a script to begin editorial review.</p>
 
         <textarea id="scriptOutput" aria-label="Editable podcast script" placeholder="The generated podcast script will appear here..."></textarea>
 
@@ -128,6 +129,8 @@
         <span id="reviewStatus" class="status status--neutral" role="status" aria-live="polite">Not Started</span>
       </div>
 
+      <p id="reviewWorkflowHint" class="review-hint">Start with an authorized source and generate a script to begin review.</p>
+
       <div id="reviewLocked" class="locked-message">
         Generate or load a podcast script to begin human review.
       </div>
@@ -143,6 +146,16 @@
             <div><strong id="summaryCompleted">0/8</strong><span>Completed</span></div>
             <div><strong id="summaryPassed">0</strong><span>Passed</span></div>
             <div><strong id="summaryRevision">0</strong><span>Revise</span></div>
+          </div>
+
+          <div class="revision-focus">
+            <div class="revision-focus__header">
+              <strong>Revision focus</strong>
+              <span id="revisionSavedState">Saved locally</span>
+            </div>
+            <ul id="revisionFocusList" class="revision-focus__list">
+              <li>No review issues flagged yet.</li>
+            </ul>
           </div>
 
           <div class="actions actions--stack">
@@ -170,6 +183,9 @@
           <p class="eyebrow">Narration</p>
           <h2>4. Audio Synthesis Workspace</h2>
           <p id="audioLockMessage">Complete the human review and approve the final script before narration.</p>
+          <p id="audioWorkflowHint" class="review-hint">
+            The audio workspace stays locked until the script is approved.
+          </p>
         </div>
         <span id="audioStatus" class="status status--neutral">Locked</span>
       </div>
@@ -210,19 +226,84 @@
         </ol>
       </article>
 
+      <article class="finish-card" id="workflowHighlight">
+        <p class="eyebrow">Studio finish</p>
+        <h2 id="workflowHighlightTitle">A polished path from draft to approval.</h2>
+        <p id="workflowHighlightBody">
+          The workspace now guides the reviewer through each decision, makes revision points visible, and keeps the audio step locked until the approved script is ready.
+        </p>
+      </article>
+
       <article class="question-card">
         <span aria-hidden="true">?</span>
         <p class="eyebrow">Reflection</p>
         <h2>What question are you currently avoiding because the answer might force you to change direction?</h2>
-        <textarea id="reflectionInput" placeholder="Write a private reflection. It remains in this browser session only."></textarea>
-        <button class="button button--secondary" id="clearReflectionButton" type="button">Clear Reflection</button>
+
+        <textarea
+          id="reflectionInput"
+          placeholder="Write a private reflection here..."
+        ></textarea>
+
+        <div class="actions">
+          <button
+            class="button button--secondary"
+            id="saveReflectionButton"
+            type="button"
+          >
+            Add to Parking Lot
+          </button>
+
+          <button
+            class="button button--secondary"
+            id="clearReflectionButton"
+            type="button"
+          >
+            Clear Draft
+          </button>
+        </div>
+      </article>
+
+      <article class="parking-card">
+        <div class="parking-card__header">
+          <div>
+            <p class="eyebrow">Reflection archive</p>
+            <h2>Reflection Parking Lot</h2>
+          </div>
+
+          <span id="parkingCount" class="parking-count">
+            0 saved
+          </span>
+        </div>
+
+        <p class="helper">
+          Save questions and reflections that deserve attention later.
+          These entries remain stored locally in this browser.
+        </p>
+
+        <div id="reflectionParkingEmpty" class="parking-empty">
+          No reflections parked yet.
+        </div>
+
+        <ul
+          id="reflectionParkingList"
+          class="parking-list"
+          aria-live="polite"
+        ></ul>
+
+        <button
+          class="button button--secondary danger"
+          id="clearParkingButton"
+          type="button"
+        >
+          Clear Parking Lot
+        </button>
       </article>
     </section>
   </main>
 
   <footer>
     <p><strong>The Quality of the Question</strong> · AI Podcast Studio</p>
-    <p>Created by Paola, Maja, and John.</p>
+    <p>Created by Paola Hintze, Marja, and John.</p>
     <p>© 2026 Paola Hintze. All rights reserved.</p>
     <p>This prototype uses only authorized editorial material. The complete book manuscript remains private.</p>
   </footer>
